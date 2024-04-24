@@ -1403,7 +1403,7 @@ public:
                                     brek = brek - 1;
                                     if (c == 38) {
                                         //...................................................................................................
-                                        cl3 = cl4;
+                                        cl3 = cl2;
 
                                         n = scanf_s("%lld", &num);
                                         scanf_s("%c", &c);
@@ -1453,58 +1453,58 @@ public:
                     scanf_s("%c", &c, 1);
                     if (c == 40) {
                         n = scanf_s("%d", &day);
-                        scanf_s("%c", &c);
+                        scanf_s("%c", &c,1);
 
                         for (int k = 0; (k < 30) && (c == 32); k++) {
-                            scanf_s("%c", &c);
+                            scanf_s("%c", &c,1);
                             if (k == 29) { st = 1; }
                         }
 
                         if (c == 46) {
 
                             p = scanf_s("%d", &month);
-                            scanf_s("%c", &c);
+                            scanf_s("%c", &c,1);
 
                             for (int k = 0; (k < 30) && (c == 32); k++) {
-                                scanf_s("%c", &c);
+                                scanf_s("%c", &c,1);
                                 if (k == 29) { st = 1; }
                             }
 
                             if (c == 46) {
 
                                 s = scanf_s("%d", &year);
-                                scanf_s("%c", &c);
+                                scanf_s("%c", &c,1);
 
                                 for (int k = 0; (k < 30) && (c == 32); k++) {
-                                    scanf_s("%c", &c);
+                                    scanf_s("%c", &c,1);
                                     if (k == 29) { st = 1; }
                                 }
 
                                 if (c == 44) {
 
                                     n1 = scanf_s("%d", &day1);
-                                    scanf_s("%c", &c);
+                                    scanf_s("%c", &c,1);
 
                                     for (int k = 0; (k < 30) && (c == 32); k++) {
-                                        scanf_s("%c", &c);
+                                        scanf_s("%c", &c,1);
                                         if (k == 29) { st = 1; }
                                     }
 
                                     if (c == 46) {
                                         p1 = scanf_s("%d", &month1);
-                                        scanf_s("%c", &c);
+                                        scanf_s("%c", &c,1);
 
                                         for (int k = 0; (k < 30) && (c == 32); k++) {
-                                            scanf_s("%c", &c);
+                                            scanf_s("%c", &c,1);
                                             if (k == 29) { st = 1; }
                                         }
 
                                         if (c == 46) {
                                             s1 = scanf_s("%d", &year1);
-                                            scanf_s("%c", &c);
+                                            scanf_s("%c", &c,1);
 
                                             for (int k = 0; (k < 30) && (c == 32); k++) {
-                                                scanf_s("%c", &c);
+                                                scanf_s("%c", &c,1);
                                                 if (k == 29) { st = 1; }
                                             }
                                             //cout << 3;
@@ -1512,14 +1512,14 @@ public:
                                     }
 
                                     if (s1 == 1 && s == 1 && n == 1 && n1 == 1 && p == 1 && p1 == 1) {
-                                        cout << "(" << year << " " << year1 << ")";
+                                        //cout << "(" << year << " " << year1 << ")";
                                         arr[2] = year; arr[0] = day; arr[1] = month;
                                         arr1[2] = year1; arr1[0] = day1; arr1[1] = month1;
                                         cl3 = cl3.select_(arr, arr1);
                                     }
                                     else {
                                         if (s == 1 && n == 1 && p == 1 && s1 == 0 && p1 == 0 && n1 == 0) {
-                                            cout << "(" << year << ")";
+                                            //cout << "(" << year << ")";
                                             arr[2] = year; arr[0] = day; arr[1] = month;
                                             cl3 = cl3.select_(arr);
                                         }
@@ -1535,59 +1535,59 @@ public:
                                     cl2 = cl3;
 
                                     while (brek != -2) {
-                                        //cout << 1;
+                                        brek = 0;
                                         if (c == 47) {
                                             cl3 = cl4;
                                             n = scanf_s("%d", &day);
-                                            scanf_s("%c", &c);
+                                            scanf_s("%c", &c,1);
 
                                             for (int k = 0; (k < 30) && (c == 32); k++) {
-                                                scanf_s("%c", &c);
+                                                scanf_s("%c", &c,1);
                                                 if (k == 29) { st = 1; }
                                             }
 
                                             if (c == 46) {
                                                 p = scanf_s("%d", &month);
-                                                scanf_s("%c", &c);
+                                                scanf_s("%c", &c,1);
 
                                                 for (int k = 0; (k < 30) && (c == 32); k++) {
-                                                    scanf_s("%c", &c);
+                                                    scanf_s("%c", &c,1);
                                                     if (k == 29) { st = 1; }
                                                 }
 
                                                 if (c == 46) {
                                                     s = scanf_s("%d", &year);
-                                                    scanf_s("%c", &c);
+                                                    scanf_s("%c", &c,1);
 
                                                     for (int k = 0; (k < 30) && (c == 32); k++) {
-                                                        scanf_s("%c", &c);
+                                                        scanf_s("%c", &c,1);
                                                         if (k == 29) { st = 1; }
                                                     }
 
                                                     if (c == 44) {
                                                         n1 = scanf_s("%d", &day1);
-                                                        scanf_s("%c", &c);
+                                                        scanf_s("%c", &c,1);
 
                                                         for (int k = 0; (k < 30) && (c == 32); k++) {
-                                                            scanf_s("%c", &c);
+                                                            scanf_s("%c", &c,1);
                                                             if (k == 29) { st = 1; }
                                                         }
 
                                                         if (c == 46) {
                                                             p1 = scanf_s("%d", &month1);
-                                                            scanf_s("%c", &c);
+                                                            scanf_s("%c", &c,1);
 
                                                             for (int k = 0; (k < 30) && (c == 32); k++) {
-                                                                scanf_s("%c", &c);
+                                                                scanf_s("%c", &c,1);
                                                                 if (k == 29) { st = 1; }
                                                             }
 
                                                             if (c == 46) {
                                                                 s1 = scanf_s("%d", &year1);
-                                                                scanf_s("%c", &c);
+                                                                scanf_s("%c", &c,1);
 
                                                                 for (int k = 0; (k < 30) && (c == 32); k++) {
-                                                                    scanf_s("%c", &c);
+                                                                    scanf_s("%c", &c,1);
                                                                     if (k == 29) { st = 1; }
                                                                 }
                                                             }
@@ -1622,66 +1622,67 @@ public:
 
                                         }
                                         else {
+                                            cl3 = cl2;
                                             brek = brek - 1;
                                             if (c == 38) {
-                                                cl3 = cl4;
                                                 n = scanf_s("%d", &day);
-                                                scanf_s("%c", &c);
+                                                scanf_s("%c", &c,1);
 
                                                 for (int k = 0; (k < 30) && (c == 32); k++) {
-                                                    scanf_s("%c", &c);
+                                                    scanf_s("%c", &c,1);
                                                     if (k == 29) { st = 1; }
                                                 }
 
                                                 if (c == 46) {
                                                     p = scanf_s("%d", &month);
-                                                    scanf_s("%c", &c);
+                                                    scanf_s("%c", &c,1);
 
                                                     for (int k = 0; (k < 30) && (c == 32); k++) {
-                                                        scanf_s("%c", &c);
+                                                        scanf_s("%c", &c,1);
                                                         if (k == 29) { st = 1; }
                                                     }
 
                                                     if (c == 46) {
                                                         s = scanf_s("%d", &year);
-                                                        scanf_s("%c", &c);
+                                                        scanf_s("%c", &c,1);
 
                                                         for (int k = 0; (k < 30) && (c == 32); k++) {
-                                                            scanf_s("%c", &c);
+                                                            scanf_s("%c", &c,1);
                                                             if (k == 29) { st = 1; }
                                                         }
 
                                                         if (c == 44) {
                                                             n1 = scanf_s("%d", &day1);
-                                                            scanf_s("%c", &c);
+                                                            scanf_s("%c", &c,1);
 
                                                             for (int k = 0; (k < 30) && (c == 32); k++) {
-                                                                scanf_s("%c", &c);
+                                                                scanf_s("%c", &c,1);
                                                                 if (k == 29) { st = 1; }
                                                             }
 
                                                             if (c == 46) {
                                                                 p1 = scanf_s("%d", &month1);
-                                                                scanf_s("%c", &c);
+                                                                scanf_s("%c", &c,1);
 
                                                                 for (int k = 0; (k < 30) && (c == 32); k++) {
-                                                                    scanf_s("%c", &c);
+                                                                    scanf_s("%c", &c,1);
                                                                     if (k == 29) { st = 1; }
                                                                 }
 
                                                                 if (c == 46) {
                                                                     s1 = scanf_s("%d", &year1);
-                                                                    scanf_s("%c", &c);
+                                                                    scanf_s("%c", &c,1);
 
                                                                     for (int k = 0; (k < 30) && (c == 32); k++) {
-                                                                        scanf_s("%c", &c);
+                                                                        scanf_s("%c", &c,1);
                                                                         if (k == 29) { st = 1; }
                                                                     }
 
                                                                 }
                                                             }
-
+                                                            //cout << n << p << s << n1 << p1 << s1;
                                                             if (s1 == 1 && s == 1 && n == 1 && n1 == 1 && p == 1 && p1 == 1) {
+                                                                //cout << "(" << year << " " << year1 << ")";
                                                                 arr[2] = year; arr[0] = day; arr[1] = month;
                                                                 arr1[2] = year1; arr1[0] = day1; arr1[1] = month1;
                                                                 cl3 = cl3.select_(arr, arr1);
@@ -1708,7 +1709,7 @@ public:
 
                                             }
                                             else {
-                                                brek = brek - 1;
+                                                brek = brek - 1; //cout << brek;
                                             }
                                         }
                                         //////
@@ -1800,7 +1801,7 @@ public:
                                     brek = brek - 1;
                                     if (c == 38) {
                                         //...................................................................................................
-                                        cl3 = cl4;
+                                        cl3 = cl2;
 
                                         n = scanf_s("%lf", &avg);
                                         scanf_s("%c", &c, 1);
@@ -1915,7 +1916,7 @@ public:
                                     brek = brek - 1;
                                     if (c == 38) {
                                         //...................................................................................................
-                                        cl3 = cl4;
+                                        cl3 = cl2;
 
                                         n = scanf_s("%lf", &sum);
                                         scanf_s("%c", &c, 1);
