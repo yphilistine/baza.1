@@ -173,6 +173,55 @@ public:
         }
     }
 
+    void edit_cl2(int id, const string& surname) {
+        for (auto& client : clients) {
+            if (client.id == id) {
+                client.surname = surname;
+            }
+        }
+    }
+
+    void edit_cl1(int id, const string& name) {
+        for (auto& client : clients) {
+            if (client.id == id) {
+                client.name = name;
+            }
+        }
+    }
+    void edit_cl3(int id,const string& patronymic) {
+        for (auto& client : clients) {
+            if (client.id == id) {
+                client.patronymic = patronymic;
+            }
+        }
+    }
+
+    void edit_cl1(int id,const int arr[3]) {
+        for (auto& client : clients) {
+            if (client.id == id) {
+                for (int i = 0; i < 3; i++) {
+                    client.arr[i] = arr[i];
+                }
+            }
+        }
+    }
+
+    void edit_cl1(int id,const long long int number) {
+        for (auto& client : clients) {
+            if (client.id == id){
+                client.number = number;
+            }
+        }
+    }
+
+    void edit_cl1(int id, const vector<double> prod) {
+        for (auto& client : clients) {
+            if (client.id == id) {
+                client.prod = prod;
+            }
+        }
+    }
+
     void edit_cl(string surnames, string names, string patronymics, const string& surname, const string& name, const string& patronymic, const int arr[3], const long long int number, const vector<double> prod) {
         vector<int> c;
         for (auto it = clients.begin(); it != clients.end(); it++) {
@@ -890,12 +939,12 @@ public:
                     }
                     if (fskob == 1 && sskob == 1 && thskob == 1 && foskob == 1 && zskob==1) {
                         s = 0; n = cli.prod.size();
-                        if (cli.name != "") { s++; }
-                        if (cli.surname != "") { s++; }
-                        if (cli.patronymic != "") { s++; }
-                        if (cli.arr[0] != -1 && cli.arr[1] != -1 && cli.arr[2] != -1) { s++; }
-                        if (cli.number != -1) { s++; }
-                        if (n > 0) { s++; }
+                        if (cli.name != "") { s++; cl.edit_cl1(cli.id, cli.name); }
+                        if (cli.surname != "") { s++;  cl.edit_cl2(cli.id, cli.surname);}
+                        if (cli.patronymic != "") { s++;  cl.edit_cl3(cli.id, cli.patronymic);}
+                        if (cli.arr[0] != -1 && cli.arr[1] != -1 && cli.arr[2] != -1) { s++; cl.edit_cl1(cli.id, cli.arr); }
+                        if (cli.number != -1) { s++;  cl.edit_cl1(cli.id, cli.number); }
+                        if (n > 0) { s++;  cl.edit_cl1(cli.id, cli.prod); }
                         if (s == 6) {
                             cl2.add_cl(cli.surname, cli.name, cli.patronymic, cli.arr, cli.number, cli.prod);
                             cl.edit_cl(cli.id,cli.surname, cli.name, cli.patronymic, cli.arr, cli.number, cli.prod);
@@ -2145,6 +2194,8 @@ public:
 
             }
         }
+
+        clien = cl;
     }
 
 
