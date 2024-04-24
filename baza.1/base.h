@@ -734,7 +734,7 @@ public:
         vector<string> com = { "edit","delete","print","sort","select","generate","correct","add","break" };
         vector<string> sortcase = { "date","dt","num","number","avg","average","sum","summ" };
         int br = 0, st = 0, cas = -1, st1 = 0, sortcas = -1;
-        char c; scanf_s("%c", &c);//10 enter 32 space 40 ( 41 ) 47 / 44 , 38 & 46 . 124 | 61 =
+        char c; scanf_s("%c", &c,1);//10 enter 32 space 40 ( 41 ) 47 / 44 , 38 & 46 . 124 | 61 =
         double b;
         int count = 0;
         client_data cl = clien;
@@ -1200,13 +1200,13 @@ public:
                         }
                         if (c == 44) {
                             //cout << "(zap1)";
-                            scanf_s("%c", &c);
+                            scanf_s("%c", &c,1);
                             for (int k = 0; (k < 255) && (((c > -33) && (c < -15)) || ((c > -129) && (c < -80))); k++) {
                                 fixchar(c);  name.append(1, c); scanf_s("%c", &c,1); n = 1;
                             }
                             if (c == 44) {
                                 //cout << "(zap2)";
-                                scanf_s("%c", &c);
+                                scanf_s("%c", &c,1);
                                 for (int k = 0; (k < 255) && (((c > -33) && (c < -15)) || ((c > -129) && (c < -80))); k++) {
                                     fixchar(c);  patron.append(1, c); scanf_s("%c", &c,1); p = 1;
                                 }
@@ -1248,7 +1248,7 @@ public:
                                         }
                                         if (c == 44) {
                                             //cout << "zap3";
-                                            scanf_s("%c", &c);
+                                            scanf_s("%c", &c,1);
                                             for (int k = 0; (k < 255) && (((c > -33) && (c < -15)) || ((c > -129) && (c < -80))); k++) {
                                                 fixchar(c);   name.append(1, c); scanf_s("%c", &c,1); n = 1; //cout << "(3)";
                                             }
@@ -1340,17 +1340,17 @@ public:
                     if (c == 40) {
                         //cout << "(skob1)";
                         n = scanf_s("%lld", &num);
-                        scanf_s("%c", &c);
+                        scanf_s("%c", &c,1);
 
                         for (int k = 0; (k < 30) && (c == 32); k++) {
-                            scanf_s("%c", &c);
+                            scanf_s("%c", &c,1);
                             if (k == 29) { st = 1; }
                         }
 
                         if (c == 44 && n == 1) {
                             // cout << "(zap1)";
                             p = scanf_s("%lld", &num1);
-                            scanf_s("%c", &c);
+                            scanf_s("%c", &c,1);
 
                             if (p == 0) { cl3 = cl3.select_(num); }
                             if (p == 1) { cl3 = cl3.select_(num, num1); } n = 0;  p = 0;
@@ -1359,7 +1359,7 @@ public:
                             cl2 = cl3;
 
                             for (int k = 0; (k < 30) && (c == 32); k++) {
-                                scanf_s("%c", &c);
+                                scanf_s("%c", &c,1);
                                 if (k == 29) { st = 1; }
                             }
 
@@ -1372,17 +1372,17 @@ public:
                                     cl3 = cl4;
 
                                     n = scanf_s("%lld", &num);
-                                    scanf_s("%c", &c);
+                                    scanf_s("%c", &c,1);
 
                                     for (int k = 0; (k < 30) && (c == 32); k++) {
-                                        scanf_s("%c", &c);
+                                        scanf_s("%c", &c,1);
                                         if (k == 29) { st = 1; }
                                     }
 
                                     if (c == 44 && n == 1) {
                                         //cout << "zap2";
                                         p = scanf_s("%lld", &num1);
-                                        scanf_s("%c", &c);
+                                        scanf_s("%c", &c,1);
 
                                         //cout << " "; for (int k = 0; k < size(name); k++) { cout << name[k]; } cout << " ";
                                         if (p == 0) { cl3 = cl3.select_(num); }
@@ -1392,7 +1392,7 @@ public:
                                         cl3.additself(cl2);//cout << 4;
 
                                         for (int k = 0; (k < 30) && (c == 32); k++) {
-                                            scanf_s("%c", &c);
+                                            scanf_s("%c", &c,1);
                                             if (k == 29) { st = 1; }
                                         }
 
@@ -1406,17 +1406,17 @@ public:
                                         cl3 = cl2;
 
                                         n = scanf_s("%lld", &num);
-                                        scanf_s("%c", &c);
+                                        scanf_s("%c", &c,1);
 
                                         for (int k = 0; (k < 30) && (c == 32); k++) {
-                                            scanf_s("%c", &c);
+                                            scanf_s("%c", &c,1);
                                             if (k == 29) { st = 1; }
                                         }
 
                                         if (c == 44 && n == 1) {
                                             cout << "zap2";
                                             p = scanf_s("%lld", &num1);
-                                            scanf_s("%c", &c);
+                                            scanf_s("%c", &c,1);
 
                                             //cout << " "; for (int k = 0; k < size(name); k++) { cout << name[k]; } cout << " ";
                                             if (p == 0) { cl3 = cl3.select_(num); }
@@ -1426,7 +1426,7 @@ public:
                                             cl2 = cl3; //cout << 4;
 
                                             for (int k = 0; (k < 30) && (c == 32); k++) {
-                                                scanf_s("%c", &c);
+                                                scanf_s("%c", &c,1);
                                                 if (k == 29) { st = 1; }
                                             }
 
@@ -1996,7 +1996,7 @@ public:
 
                 if (cas == 6) {
                     if (c == 40) {
-                        scanf_s("%c", &c);
+                        scanf_s("%c", &c,1);
                         if (c == 41) {
                             cl.correct();
                             cout << "\n\n";
