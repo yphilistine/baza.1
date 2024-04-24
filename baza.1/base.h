@@ -1280,7 +1280,7 @@ public:
                                         if (c == 38) {
                                             //cout << 2;
                                             //....................................................................................................
-                                            scanf_s("%c", c,1);
+                                            scanf_s("%c", &c,1);
 
                                             if (c == 32) {
                                                 for (int k = 0; (k < 30) && (c == 32); k++) {
@@ -1293,12 +1293,12 @@ public:
                                                 fixchar(c);  surname.append(1, c); scanf_s("%c", &c,1); s = 1;
                                             }
                                             if (c == 44) {
-                                                scanf_s("%c", c,1);
+                                                scanf_s("%c", &c,1);
                                                 for (int k = 0; (k < 255) && (((c > -33) && (c < -15)) || ((c > -129) && (c < -80))); k++) {
                                                     fixchar(c);  name.append(1, c); scanf_s("%c", &c,1); n = 1;
                                                 }
                                                 if (c == 44) {
-                                                    scanf_s("%c", c,1);
+                                                    scanf_s("%c", &c,1);
                                                     for (int k = 0; (k < 255) && (((c > -33) && (c < -15)) || ((c > -129) && (c < -80))); k++) {
                                                         fixchar(c);  patron.append(1, c); scanf_s("%c", &c,1); p = 1;
                                                     }
