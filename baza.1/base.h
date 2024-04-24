@@ -10,6 +10,8 @@
 using namespace std; 
 
 
+
+
 struct client {
     int id;
     string name;
@@ -26,6 +28,7 @@ struct client {
         }
         prod = _prod;
     }
+
 };
 
 
@@ -39,6 +42,7 @@ public:
     //......................................................................................................................................
     //helpful functions
     void getlen() { cout << id_next-1; };
+    
 
     double sumpr(const client cl) {
         double s = 0;
@@ -47,8 +51,8 @@ public:
         }return s;
     }
 
-    float avgpr(const client cl) {
-        float s = 0; int n = 0; float m;
+    double avgpr(const client cl) {
+        double s = 0; int n = 0; double m;
         for (auto it = cl.prod.begin(); it != cl.prod.end(); it++) {
             m = *it;
             s = s + m; n++; 
@@ -95,16 +99,17 @@ public:
     //......................................................................................................................................
     client_data() : id_next(1) {};
 
-    void additself(client_data cl) {
+    void additself(client_data &cl) {
         for (auto it = clients.begin(); it != clients.end(); it++) {
-            cl.add_cl(it->surname, it->name, it->patronymic, it->arr, it->number, it->prod);
+            cl.add_cl(it->surname, it->name, it->patronymic, it->arr, it->number, it->prod); //cout << "(tick)";
         }
     }
     //......................................................................................................................................
     //editing metods
 
     void add_cl(const string& surname, const string& name, const string& patronymic, const int arr[3], const long long int number, const vector<double> prod) {
-        clients.push_back(client(id_next++, surname, name, patronymic, arr, number, prod));
+        client cl(id_next,surname, name, patronymic, arr, number, prod);
+        if (safe_add(cl) !=6 ){clients.push_back(client(id_next++, surname, name, patronymic, arr, number, prod)); }
     }
 
     
@@ -142,8 +147,9 @@ public:
     void delete_cl(const string& surname, const string& name, const string& patronymic, const int arr[3], const long long int number, const vector<double> prod) {
         vector<int> c; int n=0;
         for (auto it = clients.begin(); it != clients.end(); it++) {
-            if (it->name == name && it->surname == surname && it->patronymic == patronymic && it->arr==arr && it->number == number && it->prod==prod) {
-                c.push_back(it->id);
+            //cout << "/";
+            if (it->name == name && it->surname == surname && it->patronymic == patronymic && it->arr[0] == arr[0] && it->number == number && it->prod == prod && it->arr[1] == arr[1] && it->arr[2] == arr[2]) {
+                c.push_back(it->id); //cout <<"("<< it->id<<")";
             }
         }
         for (auto it = c.begin(); it != c.end(); it++) {
@@ -442,6 +448,47 @@ public:
     //.....................................................................................................................................
     //selection methods
 
+    client_data select_0(int n) {
+        client_data out;
+        for (auto it = clients.begin(); it != clients.end(); it++) {
+            if (it->id == n) {
+                out.add_cl(it->surname, it->name, it->patronymic, it->arr, it->number, it->prod);
+            }
+        }
+        return out;
+    }
+
+    //важно
+    client_data select_1(string surname) {
+        client_data out;
+        for (auto it = clients.begin(); it != clients.end(); it++) {
+            if (it->surname == surname) {
+                out.add_cl(it->surname, it->name, it->patronymic, it->arr, it->number, it->prod);
+            }
+        }
+        return out;
+    }
+
+    client_data select_2(string name) {
+        client_data out;
+        for (auto it = clients.begin(); it != clients.end(); it++) {
+            if (it->name == name) {
+                out.add_cl(it->surname, it->name, it->patronymic, it->arr, it->number, it->prod);
+            }
+        }
+        return out;
+    }
+
+    client_data select_3(string patronymic) {
+        client_data out;
+        for (auto it = clients.begin(); it != clients.end(); it++) {
+            if (it->patronymic == patronymic) {
+                out.add_cl(it->surname, it->name, it->patronymic, it->arr, it->number, it->prod);
+            }
+        }
+        return out;
+    }
+
     client_data select_(string surname, string name, string patronymic) {
         client_data out;
         for (auto it = clients.begin(); it != clients.end(); it++) {
@@ -462,16 +509,23 @@ public:
         return out;
     }
 
+    //важно
     client_data select_(vector<double> prod) {
-        client_data out;
+        client_data out; int br = 0; int i;
         for (auto it = clients.begin(); it != clients.end(); it++) {
-            if (it->prod == prod) {
+            br = 0; i = 0;
+            for (auto it1 = it->prod.begin(); it1 != it->prod.end() && i<prod.size(); it1++) {
+                if (*it1 > prod[i] + 0.1 || *it1 < prod[i] - 0.1) { br = 1; }
+                i++;
+            }
+            if (prod.size() == it->prod.size() && br == 0) {
                 out.add_cl(it->surname, it->name, it->patronymic, it->arr, it->number, it->prod);
             }
         }
         return out;
     }
    
+    //важно
     client_data select_(int* arr1,int* arr2) {
         int d1 = (arr1[2] * 10000) + (arr1[1] * 100) + arr1[0];
         int d2 = (arr2[2] * 10000) + (arr2[1] * 100) + arr2[0];
@@ -485,11 +539,13 @@ public:
         return out;
     }
 
+    //важно
     client_data select_(int* d1) {
         return select_(d1, d1);
     }
 
-    client_data select_(float d1, float d2) {
+    //важно
+    client_data select_1(double d1, double d2) {
         client_data out;
         for (auto it = clients.begin(); it != clients.end(); it++) {
             //cout << "(" << avgpr(*it) << ") ";
@@ -500,10 +556,12 @@ public:
         return out;
     }
 
-    client_data select_(float d1) {
-        return select_(d1-1, d1+1);
+    //важно
+    client_data select_1(double d1) {
+        return select_1(d1-1, d1+1);
     }
 
+    //важно
     client_data select_(double d1, double d2) {
         client_data out;
         for (auto it = clients.begin(); it != clients.end(); it++) {
@@ -515,10 +573,12 @@ public:
         return out;
     }
 
+    //важно
     client_data select_(double d1) {
         return select_(d1-1, d1+1);
     }
 
+    //важно
     client_data select_(long long int d1,long long int d2) {
         client_data out;
         for (auto it = clients.begin(); it != clients.end(); it++) {
@@ -530,30 +590,31 @@ public:
         return out;
     }
 
+    //важно
     client_data select_(long long int d1) {
         return select_(d1, d1);
     }
 
-    client_data select_(int* arr1, int* arr2, float d1, float d2, double d3, double d4, long long int d5, long long int d6) {
+    client_data select_(int* arr1, int* arr2, double d1, double d2, double d3, double d4, long long int d5, long long int d6) {
         client_data out = select_(arr1, arr2);
-        out = out.select_(d1, d2);
+        out = out.select_1(d1, d2);
         out = out.select_(d3, d4);
         out = out.select_(d5, d6);
         return out;
     }
 
-    client_data select_(string surname, string name, string patronymic,int* arr1, float d1, double d3, long long int d6) {
+    client_data select_(string surname, string name, string patronymic,int* arr1, double d1, double d3, long long int d6) {
         client_data out = select_(arr1); //out.print_base(); //cout << "\n000\n";
-        out = out.select_(d1-1,d1+1); //out.print_base();// cout << "\n111\n";
+        out = out.select_1(d1-1,d1+1); //out.print_base();// cout << "\n111\n";
         out = out.select_(d3-1,d3+1); ///out.print_base();// cout << "\n111\n";
         out = out.select_(d6); //out.print_base();// cout << "\n111\n";
         out = out.select_(surname, name, patronymic);
         return out;
     }
 
-    client_data select_( int* arr1, float d1, double d3, long long int d6) {
+    client_data select_( int* arr1, double d1, double d3, long long int d6) {
         client_data out = select_(arr1); //out.print_base(); //cout << "\n000\n";
-        out = out.select_(d1 - 1, d1 + 1); //out.print_base(); //cout << "\n111\n";
+        out = out.select_1(d1 - 1, d1 + 1); //out.print_base(); //cout << "\n111\n";
         out = out.select_(d3 - 1, d3 + 1); //out.print_base(); //cout << "\n111\n";
         out = out.select_(d6); //out.print_base(); //cout << "\n111\n";
         return out;
@@ -593,6 +654,1497 @@ public:
             delete_cl(*it - n); n++;
         }
         return out;
+    }
+
+    int safe_add(client cl) {
+        int m=0;
+        for (auto it = clients.begin(); it != clients.end(); it++) {
+            int i = 0;
+            if (it->number == cl.number) { i++;}
+            if (it->surname == cl.surname) { i++;}
+            if (it->name == cl.name) { i++;}
+            if (it->patronymic == cl.patronymic) { i++; }
+            if (dt(*it) == dt(cl)) { i++;}
+            if (it->prod == cl.prod) { i++;}
+            if (i > m) { m = i; }
+        }
+        return m;
+    }
+    //......................................................................................................................................
+    //imput generator
+
+    void fixchar(char& c) {
+        int br = 0;
+        if (c == -16) { c = -88; return; }
+        if (c == -15) { c = -72; return; }
+        if (c >= -128 && c <= -81) { c = c + 64; return; }
+        if (c >= -32 && c <= -17) { c = c + 16; return; }
+    }
+
+    void imput(client_data clien) {
+        vector<string> com = { "edit","delete","print","sort","select","generate","correct","add","break" };
+        vector<string> sortcase = { "date","dt","num","number","avg","average","sum","summ" };
+        int br = 0, st = 0, cas = -1, st1 = 0, sortcas = -1;
+        char c; scanf_s("%c", &c);//10 enter 32 space 40 ( 41 ) 47 / 44 , 38 & 46 . 124 | 61 =
+        double b;
+        int count = 0;
+        client_data cl = clien;
+
+        while (st1 == 0 && count < 50) {
+            count++;
+            //char c11 = -52;
+            //cout << "cicle";
+            int i;
+            client_data cl2, cl3, cl4;
+            string name = "", surname = "", patron = ""; int n = 0, s = 0, p = 0, n1 = 0, p1 = 0, s1 = 0;;//
+            string imp = ""; imp.clear();
+            double sum = -1, avg = -1, sum1 = -1, avg1 = -1, pr = 0;
+            int arr[3] = { -1, -1, -1 }; int day = -1, year = -1, month = -1, year1 = -1, day1 = -1, month1 = -1;
+            int arr1[3] = { -1, -1, -1 };
+            vector<double> prod;
+            long long int num = -1, num1 = -1; //
+            int zskob=0,fskob = 0, sskob = 0, thskob = 0, foskob = 0, fiskob = 0;
+            int pl = -1;
+            int brek = 0;
+            string sortc = "";
+            client cli(1,surname,name,patron,arr,num,prod);
+
+            scanf_s("%c", &c, 1);
+            cas = -1; st1 = 0;
+            for (i = 0; (i < 255) && ((c == 10) || (c == 32)); i++) {
+                scanf_s("%c", &c, 1);
+                if (i == 254) { st = 1; };
+            }
+            if (st == 0) {
+                for (int k = 0; (k < 255) && (c > 96) && (c < 123); k++) {
+                    imp.append(1, c); scanf_s("%c", &c, 1);
+                }
+
+                //for (i = 0; i < size(imp); i++) {cout << imp[i];}
+
+                for (i = 0; i < 9; i++) {
+                    if (imp == com[i]) { cas = i; }
+                }
+                //cout << cas << "\n";
+
+                if (cas == 0) {
+                    setlocale(LC_ALL, "Russian"); st = 0;
+                    n = 0; s = 0; zskob = 0; st = 0;
+                    if (c == 40) {
+                        s = scanf_s("%d", &n);
+                        scanf_s("%c", &c, 1);
+                        for (int k = 0; (k < 30) && (c == 32); k++) {
+                            scanf_s("%c", &c, 1);
+                            if (k == 29) { st = 1; }
+                        }
+                        if (s != 0 && c == 41) {
+                            cli.id = n; zskob = 1;
+                        }
+                    }
+                    n = 0; s = 0; p = 0; fskob = 0;
+                    scanf_s("%c", &c, 1);
+                    if (c == 40) {
+                        //cout << "(skob1)";
+                        scanf_s("%c", &c, 1); pl = c;
+                        for (int k = 0; (k < 255) && (((c > -33) && (c < -15)) || ((c > -129) && (c < -80))); k++) {
+                            fixchar(c);  surname.append(1, c); scanf_s("%c", &c, 1); s = 1;
+                        }
+                        if (c == 44) {
+                            //cout << "(zap1)";
+                            scanf_s("%c", &c, 1);
+                            for (int k = 0; (k < 255) && (((c > -33) && (c < -15)) || ((c > -129) && (c < -80))); k++) {
+                                fixchar(c);  name.append(1, c); scanf_s("%c", &c, 1); n = 1;
+                            }
+                            if (c == 44) {
+                                //cout << "(zap2)";
+                                scanf_s("%c", &c, 1);
+                                for (int k = 0; (k < 255) && (((c > -33) && (c < -15)) || ((c > -129) && (c < -80))); k++) {
+                                    fixchar(c);  patron.append(1, c); scanf_s("%c", &c, 1); p = 1;
+                                }
+
+                                for (int k = 0; (k < 30) && (c == 32); k++) {
+                                    scanf_s("%c", &c, 1);
+                                    if (k == 29) { st = 1; }
+                                }
+
+                                //cout << " ";  for (int k = 0; k < size(surname); k++) { cout << surname[k]; } cout << " ";
+                                if (s == 1) { cli.surname = surname; } s = 0; surname.clear();
+                                if (n == 1) { cli.name = name; } n = 0; name.clear();
+                                if (p == 1) { cli.patronymic = patron; } p = 0; patron.clear();
+
+                                cl2 = cl3;
+
+                                //cout << 0;
+
+                                if (c == 41) {
+                                    if (st == 0) { fskob = 1; }
+                                }
+                            }
+                        }
+                        else {
+                            if (c == 41) { fskob = 1; }
+                        }
+
+                    }
+                    n = 0; s = 0; p = 0; sskob = 0;
+                    scanf_s("%c", &c, 1);
+                    if (c == 40) {
+                        //cout << "(skob1)";
+                        n = scanf_s("%lld", &num);
+                        scanf_s("%c", &c, 1);
+
+                        if (n != 0) { cli.number = num; }
+                        n = 0;
+                        num = -1;
+
+                        for (int k = 0; (k < 30) && (c == 32); k++) {
+                            scanf_s("%c", &c, 1);
+                            if (k == 29) { st = 1; }
+                        }
+
+                        if (c == 41) {
+                            if (st == 0) { sskob = 1; }
+                        };
+
+                    }
+                    n = 0; s = 0; p = 0; n1 = 0; s1 = 0; p1 = 0; thskob = 0;
+                    brek = 0;
+                    scanf_s("%c", &c, 1);
+                    if (c == 40) {
+                        n = scanf_s("%d", &day);
+                        scanf_s("%c", &c, 1);
+
+                        for (int k = 0; (k < 30) && (c == 32); k++) {
+                            scanf_s("%c", &c, 1);
+                            if (k == 29) { st = 1; }
+                        }
+
+                        if (c == 46) {
+
+                            p = scanf_s("%d", &month);
+                            scanf_s("%c", &c, 1);
+
+                            for (int k = 0; (k < 30) && (c == 32); k++) {
+                                scanf_s("%c", &c, 1);
+                                if (k == 29) { st = 1; }
+                            }
+
+                            if (c == 46) {
+
+                                s = scanf_s("%d", &year);
+                                scanf_s("%c", &c, 1);
+
+                                for (int k = 0; (k < 30) && (c == 32); k++) {
+                                    scanf_s("%c", &c, 1);
+                                    if (k == 29) { st = 1; }
+                                }
+
+
+                                if (p == 1 && s == 1 && n == 1) {
+                                    //cout << "(" << year << " " << year1 << ")";
+                                    arr[2] = year; arr[0] = day; arr[1] = month;
+                                    cli.arr[0] = arr[0]; cli.arr[1] = arr[1]; cli.arr[2] = arr[2];
+                                }
+
+                                n = 0; s = 0; p = 0; n1 = 0; s1 = 0; p1 = 0;
+
+                                if (c == 41) {
+                                    if (st == 0) { thskob = 1; }
+                                };
+                            }
+                        }
+                        else {
+                            if (c == 41 && n == 0) { thskob = 1; }
+                        }
+
+                        ///////
+                    }
+                    n = 0; s = 0; p = 0; n1 = 0; s1 = 0; p1 = 0; foskob = 0;
+                    brek = 0; pr = 0;
+                    scanf_s("%c", &c, 1);
+                    if (c == 40) {
+
+                        n = scanf_s("%lf", &pr);
+                        if (n != 0) { prod.push_back(pr); }
+
+                        while (brek != -1) {
+                            scanf_s("%c", &c, 1);
+
+                            for (int k = 0; (k < 30) && (c == 32); k++) {
+                                scanf_s("%c", &c, 1);
+                                if (k == 29) { st = 1; }
+                            }
+
+                            if (c == 124) {
+
+                                n = scanf_s("%lf", &pr);
+                                if (n != 0) {
+                                    prod.push_back(pr);
+                                }
+                            }
+                            else { brek = -1; }
+                        }
+                        if (c == 41) {
+                            if (st == 0) { cli.prod = prod; foskob = 1; }
+                        }
+                    }
+                    if (fskob == 1 && sskob == 1 && thskob == 1 && foskob == 1 && zskob==1) {
+                        s = 0; n = cli.prod.size();
+                        if (cli.name != "") { s++; }
+                        if (cli.surname != "") { s++; }
+                        if (cli.patronymic != "") { s++; }
+                        if (cli.arr[0] != -1 && cli.arr[1] != -1 && cli.arr[2] != -1) { s++; }
+                        if (cli.number != -1) { s++; }
+                        if (n > 0) { s++; }
+                        if (s == 6) {
+                            cl2.add_cl(cli.surname, cli.name, cli.patronymic, cli.arr, cli.number, cli.prod);
+                            cl.edit_cl(cli.id,cli.surname, cli.name, cli.patronymic, cli.arr, cli.number, cli.prod);
+                            cout << "\n\n";
+                            cl2.print_base();
+                            cout << "\n";
+                        }
+                    }
+
+                }
+
+                if (cas == 1) {
+                    setlocale(LC_ALL, "Russian");
+                    n = 0; s = 0; zskob = 1; st = 0;
+                    if (c == 40) {
+                        s = scanf_s("%d", &n);
+                        scanf_s("%c", &c, 1);
+                        for (int k = 0; (k < 30) && (c == 32); k++) {
+                            scanf_s("%c", &c, 1);
+                            if (k == 29) { st = 1; }
+                        }
+                        if (s != 0 && c == 41) {
+                            cl2 = cl.select_0(n);
+                            cout << "\n\n";
+                            cl2.print_base();
+                            cout << "\n";
+                            cl.delete_cl(n); n = 0; 
+                            zskob = 0; //cout << "";
+                        }
+                    }
+                    n = 0; s = 0; p = 0;fskob = 0;
+                    scanf_s("%c", &c, 1);
+                    if (c == 40) {
+                        //cout << "(skob1)";
+                        scanf_s("%c", &c, 1); pl = c;
+                        for (int k = 0; (k < 255) && (((c > -33) && (c < -15)) || ((c > -129) && (c < -80))); k++) {
+                            fixchar(c);  surname.append(1, c); scanf_s("%c", &c, 1); s = 1;
+                        }
+                        if (c == 44) {
+                            //cout << "(zap1)";
+                            scanf_s("%c", &c,1);
+                            for (int k = 0; (k < 255) && (((c > -33) && (c < -15)) || ((c > -129) && (c < -80))); k++) {
+                                fixchar(c);  name.append(1, c); scanf_s("%c", &c, 1); n = 1;
+                            }
+                            if (c == 44) {
+                                //cout << "(zap2)";
+                                scanf_s("%c", &c,1);
+                                for (int k = 0; (k < 255) && (((c > -33) && (c < -15)) || ((c > -129) && (c < -80))); k++) {
+                                    fixchar(c);  patron.append(1, c); scanf_s("%c", &c, 1); p = 1;
+                                }
+
+                                for (int k = 0; (k < 30) && (c == 32); k++) {
+                                    scanf_s("%c", &c, 1);
+                                    if (k == 29) { st = 1; }
+                                }
+
+                                //cout << " ";  for (int k = 0; k < size(surname); k++) { cout << surname[k]; } cout << " ";
+                                if (s == 1) { cli.surname = surname; } s = 0; surname.clear();
+                                if (n == 1) { cli.name = name; } n = 0; name.clear();
+                                if (p == 1) { cli.patronymic = patron; } p = 0; patron.clear();
+
+                                cl2 = cl3;
+
+                                //cout << 0;
+                                
+                                if (c == 41) {
+                                    if (st == 0) { fskob = 1; }
+                                }
+                            }
+                        }
+                        else {
+                            if (c == 41) { fskob = 1; }
+                        }
+
+                    }
+                    n = 0; s = 0; p = 0; sskob = 0;
+                    scanf_s("%c", &c, 1);
+                    if (c == 40) {
+                        //cout << "(skob1)";
+                        n = scanf_s("%lld", &num);
+                        scanf_s("%c", &c,1);
+
+                        if (n != 0) { cli.number = num; }
+                        n = 0;
+                        num = -1;
+
+                        for (int k = 0; (k < 30) && (c == 32); k++) {
+                            scanf_s("%c", &c,1);
+                            if (k == 29) { st = 1; }
+                        }
+
+                        if (c == 41) {
+                            if (st == 0) { sskob = 1; }
+                        };
+
+                    }
+                    n = 0; s = 0; p = 0; n1 = 0; s1 = 0; p1 = 0; thskob = 0;
+                    brek = 0;
+                    scanf_s("%c", &c, 1);
+                    if (c == 40) {
+                        n = scanf_s("%d", &day);
+                        scanf_s("%c", &c,1);
+
+                        for (int k = 0; (k < 30) && (c == 32); k++) {
+                            scanf_s("%c", &c,1);
+                            if (k == 29) { st = 1; }
+                        }
+
+                        if (c == 46) {
+
+                            p = scanf_s("%d", &month);
+                            scanf_s("%c", &c,1);
+
+                            for (int k = 0; (k < 30) && (c == 32); k++) {
+                                scanf_s("%c", &c,1);
+                                if (k == 29) { st = 1; }
+                            }
+
+                            if (c == 46) {
+
+                                s = scanf_s("%d", &year);
+                                scanf_s("%c", &c,1);
+
+                                for (int k = 0; (k < 30) && (c == 32); k++) {
+                                    scanf_s("%c", &c,1);
+                                    if (k == 29) { st = 1; }
+                                }
+
+
+                                if (p == 1 && s == 1 && n == 1) {
+                                    //cout << "(" << year << " " << year1 << ")";
+                                    arr[2] = year; arr[0] = day; arr[1] = month;
+                                    cli.arr[0] = arr[0]; cli.arr[1] = arr[1]; cli.arr[2] = arr[2];
+                                }
+                                    
+                                n = 0; s = 0; p = 0; n1 = 0; s1 = 0; p1 = 0;
+
+                                if (c == 41) {
+                                    if (st == 0) { thskob = 1; }
+                                };
+                            }
+                        }
+                        else {
+                            if (c == 41 && n == 0) { thskob = 1; }
+                        }
+
+                        ///////
+                    }
+                    n = 0; s = 0; p = 0; n1 = 0; s1 = 0; p1 = 0; foskob = 0;
+                    brek = 0; pr = 0;
+                    scanf_s("%c", &c, 1);
+                    if (c == 40) {
+
+                        n = scanf_s("%lf", &pr);
+                        if (n != 0) { prod.push_back(pr); }
+
+                        while (brek != -1) {
+                            scanf_s("%c", &c, 1);
+
+                            for (int k = 0; (k < 30) && (c == 32); k++) {
+                                scanf_s("%c", &c, 1);
+                                if (k == 29) { st = 1; }
+                            }
+
+                            if (c == 124) {
+                                
+                                n = scanf_s("%lf", &pr);
+                                if (n != 0) {
+                                    prod.push_back(pr);
+                                }
+                            }
+                            else { brek = -1; }
+                        }
+                        if (c == 41) {
+                            if (st == 0) { cli.prod = prod; foskob = 1; } 
+                        }
+                    }
+                    if (fskob == 1 && sskob == 1 && thskob == 1 && zskob == 1 && foskob==1) {
+                        cl2 = cl; s = 0; n = cli.prod.size();
+                        if (cli.name != "") { cl2 = cl2.select_2(cli.name); s++; }
+                        if (cli.surname != "") { cl2 = cl2.select_1(cli.surname); s++; }
+                        if (cli.patronymic != "") { cl2 = cl2.select_3(cli.patronymic); s++; }
+                        if (cli.arr[0] != -1 && cli.arr[1] != -1 && cli.arr[2] != -1) { cl2 = cl2.select_(cli.arr); s++; }
+                        if (cli.number != -1) { cl2 = cl2.select_(cli.number); s++; }
+                        if ( n > 0) { cl2 = cl2.select_(cli.prod); s++;}
+                        if (s != 0) {
+                            cout << "\n\n";
+                            cl2.print_base();
+                            cout << "\n";
+                            for (auto it = cl2.clients.begin(); it != cl2.clients.end(); it++) {
+                                cl.delete_cl(it->surname, it->name, it->patronymic, it->arr, it->number, it->prod);
+                                //cout << it->surname << " " << it->name << " " << it->patronymic << it->arr << " " << it->number << " ";
+                            }
+                        }
+                    }
+                    
+                }
+
+                if (cas == 2) {
+                    if (c == 40) {
+                        scanf_s("%c", &c,1);
+                        if (c == 41) {
+                            cout << "\n\n";
+                            cl.print_base();
+                            cl.print_base_file("out");
+                            cout << "\n";
+                        }
+                    }
+                }
+
+                if (cas == 3) {
+                    sortcas = 0;
+                    if (c == 40) {
+                        scanf_s("%c", &c, 1);
+                        for (int k = 0; (k < 30) && (c == 32); k++) {
+                            scanf_s("%c", &c, 1);
+                            if (k == 29) { st = 1; }
+                        }
+                        for (int k = 0; (k < 255) && (c > 96) && (c < 123); k++) {
+                            sortc.append(1, c); scanf_s("%c", &c, 1);
+                        }
+                        if (c == 41) {
+                            //for (i = 0; i < size(sortc); i++) { cout << sortc[i]; }
+
+                            for (int k = 0; k < 7; k++) {
+                                if (sortc == sortcase[k]) { sortcas = k; }
+                            } sortc.clear();
+                            if (sortcas == 0 || sortcas == 1) {
+                                cl.sortby_date();
+                            }
+                            if (sortcas == 2 || sortcas == 3) {
+                                cl.sortby_number();
+                            }
+                            if (sortcas == 4 || sortcas == 5) {
+                                cl.sortby_avgspent();
+                            }
+                            if (sortcas == 6 || sortcas == 7) {
+                                cl.sortby_spendings();
+                            }
+                            if (sortcas == -1) {
+                                cout << "\nnot a sorting space\n";
+                            }
+
+                            cout << "\n\n";
+                            cl.print_base();
+                            cout << "\n";
+                        }
+                    }
+                }
+
+                if (cas == 4) {
+                    setlocale(LC_ALL, "Russian");
+                    cl3 = cl; cl2 = cl; fskob = 0; st = 0;
+                    if (c == 40) {
+                        //cout << "(skob1)";
+                        scanf_s("%c", &c,1); pl = c;
+                        for (int k = 0; (k < 255) && (((c > -33) && (c < -15)) || ((c > -129) && (c < -80))); k++) {
+                            fixchar(c);  surname.append(1, c); scanf_s("%c", &c,1); s = 1;
+                        }
+                        if (c == 44) {
+                            //cout << "(zap1)";
+                            scanf_s("%c", &c);
+                            for (int k = 0; (k < 255) && (((c > -33) && (c < -15)) || ((c > -129) && (c < -80))); k++) {
+                                fixchar(c);  name.append(1, c); scanf_s("%c", &c,1); n = 1;
+                            }
+                            if (c == 44) {
+                                //cout << "(zap2)";
+                                scanf_s("%c", &c);
+                                for (int k = 0; (k < 255) && (((c > -33) && (c < -15)) || ((c > -129) && (c < -80))); k++) {
+                                    fixchar(c);  patron.append(1, c); scanf_s("%c", &c,1); p = 1;
+                                }
+
+                                for (int k = 0; (k < 30) && (c == 32); k++) {
+                                    scanf_s("%c", &c,1);
+                                    if (k == 29) { st = 1; }
+                                }
+
+                                //cout << " ";  for (int k = 0; k < size(surname); k++) { cout << surname[k]; } cout << " ";
+                                if (s == 1) { cl3 = cl3.select_1(surname); } s = 0; surname.clear();
+                                if (n == 1) { cl3 = cl3.select_2(name); } n = 0; name.clear();
+                                if (p == 1) { cl3 = cl3.select_3(patron); } p = 0; patron.clear();
+
+                                cl2 = cl3;
+
+                                //cout << 0;
+                                while (brek != -2) {
+                                    brek = 0;
+
+                                    //cout << c;
+
+                                    if (c == 47) {
+                                        //...................................................................................................
+                                        cl3 = cl;
+
+                                        scanf_s("%c", &c,1);
+
+                                        if (c == 32) {
+                                            for (int k = 0; (k < 30) && (c == 32); k++) {
+                                                scanf_s("%c", &c,1);
+                                                if (k == 29) { st = 1; }
+                                            }
+                                        }
+
+                                        //pl = c; cout <<"("<< pl<<")";
+                                        for (int k = 0; (k < 255) && (((c > -33) && (c < -15)) || ((c > -129) && (c < -80))); k++) {
+                                            fixchar(c);  surname.append(1, c); scanf_s("%c", &c,1); s = 1; //cout << "(2)";
+                                        }
+                                        if (c == 44) {
+                                            //cout << "zap3";
+                                            scanf_s("%c", &c);
+                                            for (int k = 0; (k < 255) && (((c > -33) && (c < -15)) || ((c > -129) && (c < -80))); k++) {
+                                                fixchar(c);   name.append(1, c); scanf_s("%c", &c,1); n = 1; //cout << "(3)";
+                                            }
+                                            if (c == 44) {
+                                                //cout << "zap4";
+                                                scanf_s("%c", &c,1);
+                                                for (int k = 0; (k < 255) && (((c > -33) && (c < -15)) || ((c > -129) && (c < -80))); k++) {
+                                                    fixchar(c);   patron.append(1, c); scanf_s("%c", &c,1); p = 1; //cout << "(4)";
+                                                }
+
+                                                for (int k = 0; (k < 30) && (c == 32); k++) {
+                                                    scanf_s("%c", &c,1);
+                                                    if (k == 29) { st = 1; }
+                                                }
+
+                                                //cout << " "; for (int k = 0; k < size(name); k++) { cout << name[k]; } cout << " ";
+                                                if (s == 1) { cl3 = cl3.select_1(surname); } s = 0;  surname = "";
+                                                if (n == 1) { cl3 = cl3.select_2(name); } n = 0; name = "";
+                                                if (p == 1) { cl3 = cl3.select_3(patron); } p = 0; patron = "";
+
+                                                cl3.additself(cl2); //cout << 4;
+
+                                            }
+                                            //.................................................................................................
+                                        }
+                                    }
+                                    else {
+                                        brek = brek - 1;
+                                        if (c == 38) {
+                                            //cout << 2;
+                                            //....................................................................................................
+                                            scanf_s("%c", c,1);
+
+                                            if (c == 32) {
+                                                for (int k = 0; (k < 30) && (c == 32); k++) {
+                                                    scanf_s("%c", &c,1);
+                                                    if (k == 29) { st = 1; }
+                                                }
+                                            }
+
+                                            for (int k = 0; (k < 255) && (((c > -33) && (c < -15)) || ((c > -129) && (c < -80))); k++) {
+                                                fixchar(c);  surname.append(1, c); scanf_s("%c", &c,1); s = 1;
+                                            }
+                                            if (c == 44) {
+                                                scanf_s("%c", c,1);
+                                                for (int k = 0; (k < 255) && (((c > -33) && (c < -15)) || ((c > -129) && (c < -80))); k++) {
+                                                    fixchar(c);  name.append(1, c); scanf_s("%c", &c,1); n = 1;
+                                                }
+                                                if (c == 44) {
+                                                    scanf_s("%c", c,1);
+                                                    for (int k = 0; (k < 255) && (((c > -33) && (c < -15)) || ((c > -129) && (c < -80))); k++) {
+                                                        fixchar(c);  patron.append(1, c); scanf_s("%c", &c,1); p = 1;
+                                                    }
+
+                                                    for (int k = 0; (k < 30) && (c == 32); k++) {
+                                                        scanf_s("%c", &c,1);
+                                                        if (k == 29) { st = 1; }
+                                                    }
+
+                                                    if (s == 1) { cl3 = cl3.select_1(surname); } s = 0; surname = "";
+                                                    if (n == 1) { cl3 = cl3.select_2(name); } n = 0; name = "";
+                                                    if (p == 1) { cl3 = cl3.select_3(patron); } p = 0;  patron = "";
+
+                                                    cl2 = cl3;
+                                                }
+                                                //.................................................................................................
+                                            }
+
+                                        }
+                                        else { brek = brek - 1; }
+                                    }
+                                }
+
+                                if (c == 41) {
+                                    //cout << "\n\n";
+                                    //cl2.print_base();
+                                    //cout << "\n";
+                                    if (st == 0) { fskob = 1; }
+                                }
+                            }
+                        }
+                        else {
+                            if (c == 41) { fskob = 1; }
+                        }
+
+                    }
+                    brek = 0; sskob = 0; cl3 = cl2; cl4 = cl2;
+                    scanf_s("%c", &c, 1);
+                    if (c == 40) {
+                        //cout << "(skob1)";
+                        n = scanf_s("%lld", &num);
+                        scanf_s("%c", &c);
+
+                        for (int k = 0; (k < 30) && (c == 32); k++) {
+                            scanf_s("%c", &c);
+                            if (k == 29) { st = 1; }
+                        }
+
+                        if (c == 44 && n == 1) {
+                            // cout << "(zap1)";
+                            p = scanf_s("%lld", &num1);
+                            scanf_s("%c", &c);
+
+                            if (p == 0) { cl3 = cl3.select_(num); }
+                            if (p == 1) { cl3 = cl3.select_(num, num1); } n = 0;  p = 0;
+                            num = -1; num1 = -1;
+
+                            cl2 = cl3;
+
+                            for (int k = 0; (k < 30) && (c == 32); k++) {
+                                scanf_s("%c", &c);
+                                if (k == 29) { st = 1; }
+                            }
+
+                            //cout << 0;
+                            while (brek != -2) {
+                                brek = 0;
+
+                                if (c == 47) {
+                                    //...................................................................................................
+                                    cl3 = cl4;
+
+                                    n = scanf_s("%lld", &num);
+                                    scanf_s("%c", &c);
+
+                                    for (int k = 0; (k < 30) && (c == 32); k++) {
+                                        scanf_s("%c", &c);
+                                        if (k == 29) { st = 1; }
+                                    }
+
+                                    if (c == 44 && n == 1) {
+                                        //cout << "zap2";
+                                        p = scanf_s("%lld", &num1);
+                                        scanf_s("%c", &c);
+
+                                        //cout << " "; for (int k = 0; k < size(name); k++) { cout << name[k]; } cout << " ";
+                                        if (p == 0) { cl3 = cl3.select_(num); }
+                                        if (p == 1) { cl3 = cl3.select_(num, num1); } n = 0;  p = 0;
+                                        num = -1; num1 = -1;
+
+                                        cl3.additself(cl2);//cout << 4;
+
+                                        for (int k = 0; (k < 30) && (c == 32); k++) {
+                                            scanf_s("%c", &c);
+                                            if (k == 29) { st = 1; }
+                                        }
+
+                                        //.................................................................................................
+                                    }
+                                }
+                                else {
+                                    brek = brek - 1;
+                                    if (c == 38) {
+                                        //...................................................................................................
+                                        cl3 = cl4;
+
+                                        n = scanf_s("%lld", &num);
+                                        scanf_s("%c", &c);
+
+                                        for (int k = 0; (k < 30) && (c == 32); k++) {
+                                            scanf_s("%c", &c);
+                                            if (k == 29) { st = 1; }
+                                        }
+
+                                        if (c == 44 && n == 1) {
+                                            cout << "zap2";
+                                            p = scanf_s("%lld", &num1);
+                                            scanf_s("%c", &c);
+
+                                            //cout << " "; for (int k = 0; k < size(name); k++) { cout << name[k]; } cout << " ";
+                                            if (p == 0) { cl3 = cl3.select_(num); }
+                                            if (p == 1) { cl3 = cl3.select_(num, num1); } n = 0;  p = 0;
+                                            num = -1; num1 = -1;
+
+                                            cl2 = cl3; //cout << 4;
+
+                                            for (int k = 0; (k < 30) && (c == 32); k++) {
+                                                scanf_s("%c", &c);
+                                                if (k == 29) { st = 1; }
+                                            }
+
+                                            //.................................................................................................
+                                        }
+                                    }
+                                    else { brek = brek - 1; }
+                                }
+                            }
+
+                            if (c == 41) {
+                                /*cout << "\n\n";
+                                cl2.print_base();
+                                cout << "\n";*/
+                                if (st == 0) { sskob = 1; }
+                            };
+                        }
+                        else {
+                            if (c == 41 && n == 0) { sskob = 1; }
+                        }
+                    }
+                    n = 0; s = 0; p = 0; n1 = 0; s1 = 0; p1 = 0; thskob = 0;
+                    cl3 = cl2; cl4 = cl2; brek = 0;
+                    scanf_s("%c", &c, 1);
+                    if (c == 40) {
+                        n = scanf_s("%d", &day);
+                        scanf_s("%c", &c);
+
+                        for (int k = 0; (k < 30) && (c == 32); k++) {
+                            scanf_s("%c", &c);
+                            if (k == 29) { st = 1; }
+                        }
+
+                        if (c == 46) {
+
+                            p = scanf_s("%d", &month);
+                            scanf_s("%c", &c);
+
+                            for (int k = 0; (k < 30) && (c == 32); k++) {
+                                scanf_s("%c", &c);
+                                if (k == 29) { st = 1; }
+                            }
+
+                            if (c == 46) {
+
+                                s = scanf_s("%d", &year);
+                                scanf_s("%c", &c);
+
+                                for (int k = 0; (k < 30) && (c == 32); k++) {
+                                    scanf_s("%c", &c);
+                                    if (k == 29) { st = 1; }
+                                }
+
+                                if (c == 44) {
+
+                                    n1 = scanf_s("%d", &day1);
+                                    scanf_s("%c", &c);
+
+                                    for (int k = 0; (k < 30) && (c == 32); k++) {
+                                        scanf_s("%c", &c);
+                                        if (k == 29) { st = 1; }
+                                    }
+
+                                    if (c == 46) {
+                                        p1 = scanf_s("%d", &month1);
+                                        scanf_s("%c", &c);
+
+                                        for (int k = 0; (k < 30) && (c == 32); k++) {
+                                            scanf_s("%c", &c);
+                                            if (k == 29) { st = 1; }
+                                        }
+
+                                        if (c == 46) {
+                                            s1 = scanf_s("%d", &year1);
+                                            scanf_s("%c", &c);
+
+                                            for (int k = 0; (k < 30) && (c == 32); k++) {
+                                                scanf_s("%c", &c);
+                                                if (k == 29) { st = 1; }
+                                            }
+                                            //cout << 3;
+                                        }
+                                    }
+
+                                    if (s1 == 1 && s == 1 && n == 1 && n1 == 1 && p == 1 && p1 == 1) {
+                                        cout << "(" << year << " " << year1 << ")";
+                                        arr[2] = year; arr[0] = day; arr[1] = month;
+                                        arr1[2] = year1; arr1[0] = day1; arr1[1] = month1;
+                                        cl3 = cl3.select_(arr, arr1);
+                                    }
+                                    else {
+                                        if (s == 1 && n == 1 && p == 1 && s1 == 0 && p1 == 0 && n1 == 0) {
+                                            cout << "(" << year << ")";
+                                            arr[2] = year; arr[0] = day; arr[1] = month;
+                                            cl3 = cl3.select_(arr);
+                                        }
+                                        else {
+                                            if (s1 == 1 && n1 == 1 && p1 == 1 && s == 0 && p == 0 && n == 0) {
+                                                arr1[2] = year1; arr1[0] = day1; arr1[1] = month1;
+                                                cl3 = cl3.select_(arr1);
+                                            }
+                                            else { st = 1; }
+                                        }
+                                    }
+                                    n = 0; s = 0; p = 0; n1 = 0; s1 = 0; p1 = 0;
+                                    cl2 = cl3;
+
+                                    while (brek != -2) {
+                                        //cout << 1;
+                                        if (c == 47) {
+                                            cl3 = cl4;
+                                            n = scanf_s("%d", &day);
+                                            scanf_s("%c", &c);
+
+                                            for (int k = 0; (k < 30) && (c == 32); k++) {
+                                                scanf_s("%c", &c);
+                                                if (k == 29) { st = 1; }
+                                            }
+
+                                            if (c == 46) {
+                                                p = scanf_s("%d", &month);
+                                                scanf_s("%c", &c);
+
+                                                for (int k = 0; (k < 30) && (c == 32); k++) {
+                                                    scanf_s("%c", &c);
+                                                    if (k == 29) { st = 1; }
+                                                }
+
+                                                if (c == 46) {
+                                                    s = scanf_s("%d", &year);
+                                                    scanf_s("%c", &c);
+
+                                                    for (int k = 0; (k < 30) && (c == 32); k++) {
+                                                        scanf_s("%c", &c);
+                                                        if (k == 29) { st = 1; }
+                                                    }
+
+                                                    if (c == 44) {
+                                                        n1 = scanf_s("%d", &day1);
+                                                        scanf_s("%c", &c);
+
+                                                        for (int k = 0; (k < 30) && (c == 32); k++) {
+                                                            scanf_s("%c", &c);
+                                                            if (k == 29) { st = 1; }
+                                                        }
+
+                                                        if (c == 46) {
+                                                            p1 = scanf_s("%d", &month1);
+                                                            scanf_s("%c", &c);
+
+                                                            for (int k = 0; (k < 30) && (c == 32); k++) {
+                                                                scanf_s("%c", &c);
+                                                                if (k == 29) { st = 1; }
+                                                            }
+
+                                                            if (c == 46) {
+                                                                s1 = scanf_s("%d", &year1);
+                                                                scanf_s("%c", &c);
+
+                                                                for (int k = 0; (k < 30) && (c == 32); k++) {
+                                                                    scanf_s("%c", &c);
+                                                                    if (k == 29) { st = 1; }
+                                                                }
+                                                            }
+                                                        }
+
+                                                        if (s1 == 1 && s == 1 && n == 1 && n1 == 1 && p == 1 && p1 == 1) {
+                                                            //cout << 1;
+                                                            arr[2] = year; arr[0] = day; arr[1] = month;
+                                                            arr1[2] = year1; arr1[0] = day1; arr1[1] = month1;
+                                                            cl3 = cl3.select_(arr, arr1);
+                                                        }
+                                                        else {
+                                                            if (s == 1 && n == 1 && p == 1 && s1 == 0 && p1 == 0 && n1 == 0) {
+                                                                arr[2] = year; arr[0] = day; arr[1] = month;
+                                                                cl3 = cl3.select_(arr);
+                                                            }
+                                                            else {
+                                                                if (s1 == 1 && n1 == 1 && p1 == 1 && s == 0 && p == 0 && n == 0) {
+                                                                    arr1[2] = year1; arr1[0] = day1; arr1[1] = month1;
+                                                                    cl3 = cl3.select_(arr1);
+                                                                }
+                                                                else { st = 1; }
+                                                            }
+                                                        }
+                                                        n = 0; s = 0; p = 0; n1 = 0; s1 = 0; p1 = 0;
+                                                        cl3.additself(cl2);
+
+                                                    }
+                                                }
+
+                                            }
+
+                                        }
+                                        else {
+                                            brek = brek - 1;
+                                            if (c == 38) {
+                                                cl3 = cl4;
+                                                n = scanf_s("%d", &day);
+                                                scanf_s("%c", &c);
+
+                                                for (int k = 0; (k < 30) && (c == 32); k++) {
+                                                    scanf_s("%c", &c);
+                                                    if (k == 29) { st = 1; }
+                                                }
+
+                                                if (c == 46) {
+                                                    p = scanf_s("%d", &month);
+                                                    scanf_s("%c", &c);
+
+                                                    for (int k = 0; (k < 30) && (c == 32); k++) {
+                                                        scanf_s("%c", &c);
+                                                        if (k == 29) { st = 1; }
+                                                    }
+
+                                                    if (c == 46) {
+                                                        s = scanf_s("%d", &year);
+                                                        scanf_s("%c", &c);
+
+                                                        for (int k = 0; (k < 30) && (c == 32); k++) {
+                                                            scanf_s("%c", &c);
+                                                            if (k == 29) { st = 1; }
+                                                        }
+
+                                                        if (c == 44) {
+                                                            n1 = scanf_s("%d", &day1);
+                                                            scanf_s("%c", &c);
+
+                                                            for (int k = 0; (k < 30) && (c == 32); k++) {
+                                                                scanf_s("%c", &c);
+                                                                if (k == 29) { st = 1; }
+                                                            }
+
+                                                            if (c == 46) {
+                                                                p1 = scanf_s("%d", &month1);
+                                                                scanf_s("%c", &c);
+
+                                                                for (int k = 0; (k < 30) && (c == 32); k++) {
+                                                                    scanf_s("%c", &c);
+                                                                    if (k == 29) { st = 1; }
+                                                                }
+
+                                                                if (c == 46) {
+                                                                    s1 = scanf_s("%d", &year1);
+                                                                    scanf_s("%c", &c);
+
+                                                                    for (int k = 0; (k < 30) && (c == 32); k++) {
+                                                                        scanf_s("%c", &c);
+                                                                        if (k == 29) { st = 1; }
+                                                                    }
+
+                                                                }
+                                                            }
+
+                                                            if (s1 == 1 && s == 1 && n == 1 && n1 == 1 && p == 1 && p1 == 1) {
+                                                                arr[2] = year; arr[0] = day; arr[1] = month;
+                                                                arr1[2] = year1; arr1[0] = day1; arr1[1] = month1;
+                                                                cl3 = cl3.select_(arr, arr1);
+                                                            }
+                                                            else {
+                                                                if (s == 1 && n == 1 && p == 1 && s1 == 0 && p1 == 0 && n1 == 0) {
+                                                                    arr[2] = year; arr[0] = day; arr[1] = month;
+                                                                    cl3 = cl3.select_(arr);
+                                                                }
+                                                                else {
+                                                                    if (s1 == 1 && n1 == 1 && p1 == 1 && s == 0 && p == 0 && n == 0) {
+                                                                        arr1[2] = year1; arr1[0] = day1; arr1[1] = month1;
+                                                                        cl3 = cl3.select_(arr1);
+                                                                    }
+                                                                    else { st = 1; }
+                                                                }
+                                                            }
+                                                            n = 0; s = 0; p = 0; n1 = 0; s1 = 0; p1 = 0;
+                                                            cl2 = cl3;
+                                                        }
+                                                    }
+
+                                                }
+
+                                            }
+                                            else {
+                                                brek = brek - 1;
+                                            }
+                                        }
+                                        //////
+                                    }
+
+                                    if (c == 41) {
+                                        /*cout << "\n\n";
+                                        cl2.print_base();
+                                        cout << "\n";*/
+                                        if (st == 0) { thskob = 1; }
+                                    };
+                                }
+                            }
+                        }
+                        else {
+                            if (c == 41 && n == 0) { thskob = 1; }
+                        }
+
+                        ///////
+                    }
+                    brek = 0; foskob = 0; cl3 = cl2; cl4 = cl2;
+                    scanf_s("%c", &c, 1);
+                    if (c == 40) {
+                        //cout << "(skob1)";
+                        n = scanf_s("%lf", &avg);
+                        scanf_s("%c", &c, 1);
+                        //int p2 = c; cout << p2;
+                        for (int k = 0; (k < 30) && (c == 32); k++) {
+                            scanf_s("%c", &c, 1);
+                            if (k == 29) { st = 1; }
+                        }
+
+                        if (c == 124 && n != 0) {
+                            //cout << "(zap1)";
+                            p = scanf_s("%lf", &avg1);
+                            //cout << avg1;
+                            s = scanf_s("%c", &c, 1);
+                            //cout << "(" << s << ")";
+
+                            if (p == 0) { cl3 = cl3.select_1(avg); }
+                            if (p != 0) { cl3 = cl3.select_1(avg, avg1); } n = 0;  p = 0;
+
+                            cl2 = cl3;
+
+                            for (int k = 0; (k < 30) && (c == 32); k++) {
+                                scanf_s("%c", &c, 1);
+                                if (k == 29) { st = 1; }
+                            }
+
+                            //cl3.getlen();
+                            while (brek != -2) {
+                                brek = 0;
+
+                                if (c == 47) {
+                                    //cout << "zap2";
+                                    //...................................................................................................
+                                    cl3 = cl4;
+
+                                    n = scanf_s("%lf", &avg);
+                                    scanf_s("%c", &c, 1);
+
+
+                                    for (int k = 0; (k < 30) && (c == 32); k++) {
+                                        scanf_s("%c", &c, 1);
+                                        if (k == 29) { st = 1; }
+                                    }
+                                    //cout << c << avg;
+                                    if (c == 124 && n != 0) {
+                                        //cout << "zap2";
+                                        p = scanf_s("%lf", &avg1);
+                                        scanf_s("%c", &c, 1);
+                                        //cout << avg1;
+
+                                        //cout << " "; for (int k = 0; k < size(name); k++) { cout << name[k]; } cout << " ";
+                                        if (p == 0) { cl3 = cl3.select_1(avg); cout << "p=0"; }
+                                        if (p != 0) { cl3 = cl3.select_1(avg, avg1); cout << "p!=0"; } n = 0;  p = 0;
+
+                                        cl3.additself(cl2);//cout << 4;
+
+                                        for (int k = 0; (k < 30) && (c == 32); k++) {
+                                            scanf_s("%c", &c, 1);
+                                            if (k == 29) { st = 1; }
+                                        }
+
+                                        //.................................................................................................
+                                    }
+                                }
+                                else {
+                                    brek = brek - 1;
+                                    if (c == 38) {
+                                        //...................................................................................................
+                                        cl3 = cl4;
+
+                                        n = scanf_s("%lf", &avg);
+                                        scanf_s("%c", &c, 1);
+
+                                        for (int k = 0; (k < 30) && (c == 32); k++) {
+                                            scanf_s("%c", &c, 1);
+                                            if (k == 29) { st = 1; }
+                                        }
+
+                                        if (c == 124 && n != 0) {
+                                            //cout << "zap2";
+                                            p = scanf_s("%lf", &avg1);
+                                            scanf_s("%c", &c, 1);
+
+                                            //cout << " "; for (int k = 0; k < size(name); k++) { cout << name[k]; } cout << " ";
+                                            if (p == 0) { cl3 = cl3.select_1(avg); }
+                                            if (p != 0) { cl3 = cl3.select_1(avg, avg1); } n = 0;  p = 0;
+
+                                            cl2 = cl3; //cout << 4;
+
+                                            for (int k = 0; (k < 30) && (c == 32); k++) {
+                                                scanf_s("%c", &c, 1);
+                                                if (k == 29) { st = 1; }
+                                            }
+
+                                            //.................................................................................................
+                                        }
+                                    }
+                                    else { brek = brek - 1; }
+                                }
+                            }
+                            //cout << c;
+                            if (c == 41) {
+                                /*cout << "\n\n";
+                                cl2.print_base();
+                                cout << "\n";*/
+                                if (st == 0) { foskob = 1; }
+                            };
+                        }
+                        else {
+                            if (c == 41 && n == 0) { foskob = 1; }
+                        }
+                    }
+                    brek = 0; fiskob = 0; cl3 = cl2; cl4 = cl2;
+                    scanf_s("%c", &c, 1);
+                    if (c == 40) {
+                        //cout << "(skob1)";
+                        n = scanf_s("%lf", &sum);
+                        scanf_s("%c", &c, 1);
+
+                        for (int k = 0; (k < 30) && (c == 32); k++) {
+                            scanf_s("%c", &c, 1);
+                            if (k == 29) { st = 1; }
+                        }
+                        int p2 = c; //cout << p2;
+
+                        if (c == 124 && n != 0) {
+                            //cout << "(zap1)";
+                            p = scanf_s("%lf", &sum1);
+                            //cout << sum1;
+                            scanf_s("%c", &c, 1);
+
+
+                            if (p == 0) { cl3 = cl3.select_(sum); }
+                            if (p != 0) {
+                                cl3 = cl3.select_(sum, sum1);
+                            } n = 0;  p = 0;
+
+                            cl2 = cl3;
+
+                            for (int k = 0; (k < 30) && (c == 32); k++) {
+                                scanf_s("%c", &c, 1);
+                                if (k == 29) { st = 1; }
+                            }
+
+                            //cout << 0;
+                            while (brek != -2) {
+                                brek = 0;
+
+                                if (c == 47) {
+                                    //...................................................................................................
+                                    cl3 = cl4;
+
+                                    n = scanf_s("%lf", &sum);
+                                    scanf_s("%c", &c, 1);
+
+                                    for (int k = 0; (k < 30) && (c == 32); k++) {
+                                        scanf_s("%c", &c, 1);
+                                        if (k == 29) { st = 1; }
+                                    }
+
+                                    if (c == 124 && n != 0) {
+                                        //cout << "zap2";
+                                        p = scanf_s("%lf", &sum1);
+                                        scanf_s("%c", &c, 1);
+
+                                        //cout << " "; for (int k = 0; k < size(name); k++) { cout << name[k]; } cout << " ";
+                                        if (p == 0) { cl3 = cl3.select_(sum); }
+                                        if (p != 0) { cl3 = cl3.select_(sum, sum1); } n = 0;  p = 0;
+
+                                        cl3.additself(cl2);//cout << 4;
+
+                                        for (int k = 0; (k < 30) && (c == 32); k++) {
+                                            scanf_s("%c", &c, 1);
+                                            if (k == 29) { st = 1; }
+                                        }
+
+                                        //.................................................................................................
+                                    }
+                                }
+                                else {
+                                    brek = brek - 1;
+                                    if (c == 38) {
+                                        //...................................................................................................
+                                        cl3 = cl4;
+
+                                        n = scanf_s("%lf", &sum);
+                                        scanf_s("%c", &c, 1);
+
+                                        for (int k = 0; (k < 30) && (c == 32); k++) {
+                                            scanf_s("%c", &c, 1);
+                                            if (k == 29) { st = 1; }
+                                        }
+
+                                        if (c == 124 && n == 1) {
+                                            //cout << "zap2";
+                                            p = scanf_s("%lf", &sum1);
+                                            scanf_s("%c", &c, 1);
+
+                                            //cout << " "; for (int k = 0; k < size(name); k++) { cout << name[k]; } cout << " ";
+                                            if (p == 0) { cl3 = cl3.select_(sum); }
+                                            if (p != 0) { cl3 = cl3.select_(sum, sum1); } n = 0;  p = 0;
+
+                                            cl2 = cl3; //cout << 4;
+
+                                            for (int k = 0; (k < 30) && (c == 32); k++) {
+                                                scanf_s("%c", &c, 1);
+                                                if (k == 29) { st = 1; }
+                                            }
+
+                                            //.................................................................................................
+                                        }
+                                    }
+                                    else { brek = brek - 1; }
+                                }
+                            }
+
+                            if (c == 41) {
+                                if (st == 0) { fiskob = 1; }
+                            };
+                        }
+                        else {
+                            if (c == 41 && n == 0) { fiskob = 1; }
+                        }
+                    }
+                    scanf_s("%c", &c, 1);
+                    //int p11 = c;  cout << p11;
+                    if (c == 61) {
+                        if (fskob == 1 && sskob == 1 && thskob == 1 && foskob == 1 && fiskob == 1) {
+                            cl = cl2;
+                            cout << "\n\n";
+                            cl.print_base();
+                            cout << "\n";
+                        }
+                    }
+                    else {
+                        if (fskob == 1 && sskob == 1 && thskob == 1 && foskob == 1 && fiskob == 1) {
+                            cout << "\n\n";
+                            cl2.print_base();
+                            cout << "\n";
+                        }
+                    }
+                }
+
+                if (cas == 5) {
+                    n = 0; s = 0;
+                    if (c == 40) {
+                        s = scanf_s("%d", &n);
+                        scanf_s("%c", &c,1);
+                        for (int k = 0; (k < 30) && (c == 32); k++) {
+                            scanf_s("%c", &c,1);
+                            if (k == 29) { st = 1; }
+                        }
+                        if (c == 41 && s == 1) {
+                            cl.generate_base(n);
+                            cout << "\n\n";
+                            cl.print_base();
+                            cout << "\n";
+                        }
+                    }
+                }
+
+                if (cas == 6) {
+                    if (c == 40) {
+                        scanf_s("%c", &c);
+                        if (c == 41) {
+                            cl.correct();
+                            cout << "\n\n";
+                            cl.print_base();
+                            cout << "\n";
+                        }
+                    }
+                }
+
+                if (cas == 7) {
+                    //cout << "(0)";
+                    setlocale(LC_ALL, "Russian"); st = 0;
+                    n = 0; s = 0; p = 0; fskob = 0;
+                    if (c == 40) {
+                        //cout << "(skob1)";
+                        scanf_s("%c", &c, 1); pl = c;
+                        for (int k = 0; (k < 255) && (((c > -33) && (c < -15)) || ((c > -129) && (c < -80))); k++) {
+                            fixchar(c);  surname.append(1, c); scanf_s("%c", &c, 1); s = 1;
+                        }
+                        if (c == 44) {
+                            //cout << "(zap1)";
+                            scanf_s("%c", &c, 1);
+                            for (int k = 0; (k < 255) && (((c > -33) && (c < -15)) || ((c > -129) && (c < -80))); k++) {
+                                fixchar(c);  name.append(1, c); scanf_s("%c", &c, 1); n = 1;
+                            }
+                            if (c == 44) {
+                                //cout << "(zap2)";
+                                scanf_s("%c", &c, 1);
+                                for (int k = 0; (k < 255) && (((c > -33) && (c < -15)) || ((c > -129) && (c < -80))); k++) {
+                                    fixchar(c);  patron.append(1, c); scanf_s("%c", &c, 1); p = 1;
+                                }
+
+                                for (int k = 0; (k < 30) && (c == 32); k++) {
+                                    scanf_s("%c", &c, 1);
+                                    if (k == 29) { st = 1; }
+                                }
+
+                                //cout << " ";  for (int k = 0; k < size(surname); k++) { cout << surname[k]; } cout << " ";
+                                if (s == 1) { cli.surname = surname;  } s = 0; surname.clear();
+                                if (n == 1) { cli.name = name; } n = 0; name.clear();
+                                if (p == 1) { cli.patronymic = patron; } p = 0; patron.clear();
+
+                                cl2 = cl3;
+
+                                //cout << 0;
+
+                                if (c == 41) {
+                                    if (st == 0) { fskob = 1; }
+                                }
+                            }
+                        }
+                        else {
+                            if (c == 41) { fskob = 1; }
+                        }
+
+                    }
+                    n = 0; s = 0; p = 0; sskob = 0;
+                    scanf_s("%c", &c, 1);
+                    if (c == 40) {
+                        //cout << "(skob1)";
+                        n = scanf_s("%lld", &num);
+                        scanf_s("%c", &c, 1);
+
+                        if (n != 0) { cli.number = num; }
+                        n = 0;
+                        num = -1;
+
+                        for (int k = 0; (k < 30) && (c == 32); k++) {
+                            scanf_s("%c", &c, 1);
+                            if (k == 29) { st = 1; }
+                        }
+
+                        if (c == 41) {
+                            if (st == 0) { sskob = 1; }
+                        };
+
+                    }
+                    n = 0; s = 0; p = 0; n1 = 0; s1 = 0; p1 = 0; thskob = 0;
+                    brek = 0;
+                    scanf_s("%c", &c, 1);
+                    if (c == 40) {
+                        n = scanf_s("%d", &day);
+                        scanf_s("%c", &c, 1);
+
+                        for (int k = 0; (k < 30) && (c == 32); k++) {
+                            scanf_s("%c", &c, 1);
+                            if (k == 29) { st = 1; }
+                        }
+
+                        if (c == 46) {
+
+                            p = scanf_s("%d", &month);
+                            scanf_s("%c", &c, 1);
+
+                            for (int k = 0; (k < 30) && (c == 32); k++) {
+                                scanf_s("%c", &c, 1);
+                                if (k == 29) { st = 1; }
+                            }
+
+                            if (c == 46) {
+
+                                s = scanf_s("%d", &year);
+                                scanf_s("%c", &c, 1);
+
+                                for (int k = 0; (k < 30) && (c == 32); k++) {
+                                    scanf_s("%c", &c, 1);
+                                    if (k == 29) { st = 1; }
+                                }
+
+
+                                if (p == 1 && s == 1 && n == 1) {
+                                    //cout << "(" << year << " " << year1 << ")";
+                                    arr[2] = year; arr[0] = day; arr[1] = month;
+                                    cli.arr[0] = arr[0]; cli.arr[1] = arr[1]; cli.arr[2] = arr[2];
+                                }
+
+                                n = 0; s = 0; p = 0; n1 = 0; s1 = 0; p1 = 0;
+
+                                if (c == 41) {
+                                    if (st == 0) { thskob = 1; }
+                                };
+                            }
+                        }
+                        else {
+                            if (c == 41 && n == 0) { thskob = 1; }
+                        }
+
+                        ///////
+                    }
+                    n = 0; s = 0; p = 0; n1 = 0; s1 = 0; p1 = 0; foskob = 0;
+                    brek = 0; pr = 0;
+                    scanf_s("%c", &c, 1);
+                    if (c == 40) {
+
+                        n = scanf_s("%lf", &pr);
+                        if (n != 0) { prod.push_back(pr); }
+
+                        while (brek != -1) {
+                            scanf_s("%c", &c, 1);
+
+                            for (int k = 0; (k < 30) && (c == 32); k++) {
+                                scanf_s("%c", &c, 1);
+                                if (k == 29) { st = 1; }
+                            }
+
+                            if (c == 124) {
+
+                                n = scanf_s("%lf", &pr);
+                                if (n != 0) {
+                                    prod.push_back(pr);
+                                }
+                            }
+                            else { brek = -1; }
+                        }
+                        if (c == 41) {
+                            if (st == 0) { cli.prod = prod; foskob = 1; }
+                        }
+                    }
+                    if (fskob == 1 && sskob == 1 && thskob == 1 && foskob == 1) {
+                        s = 0; n = cli.prod.size();
+                        if (cli.name != "") {s++; }
+                        if (cli.surname != "") { s++; }
+                        if (cli.patronymic != "") {s++; }
+                        if (cli.arr[0] != -1 && cli.arr[1] != -1 && cli.arr[2] != -1) {s++; }
+                        if (cli.number != -1) { s++; }
+                        if (n > 0) {s++; }
+                        if (s == 6) {
+                            cl2.add_cl(cli.surname, cli.name, cli.patronymic, cli.arr, cli.number, cli.prod);
+                            cl.add_cl(cli.surname, cli.name, cli.patronymic, cli.arr, cli.number, cli.prod);
+                            cout << "\n\n";
+                            cl2.print_base();
+                            cout << "\n";
+                        }
+                    }
+
+                }
+
+                if (cas == 8) {
+                    st1 = 1; cout << "\nend of imput\n";
+                }
+
+                if (cas == -1) {
+                    cout << "\n\nnot a command!\n\n";
+                }
+
+                cout << "(next cicle)\n";
+
+
+                //cout << st;
+
+            }
+        }
     }
 
 
@@ -653,16 +2205,17 @@ public:
 
             const long long int c = rand() % 10 + (rand() % 10) * 10 + (rand() % 10) * 100 + (rand() % 10) * 100 + (rand() % 10) * 1000 + (rand() % 10) * 10000 + (rand() % 10) * 100000 + (rand() % 10) * 1000000;
             const int m = rand() % 9; //cout << " (" << m << ") \n"; 
+            const int m1 = rand() % 2 + 7;
             value = 0;
-            if (m == 0) { value = 74950000000 + c; }
-            if (m == 1) { value = 74990000000 + c; }
-            if (m == 2) { value = 79160000000 + c; }
-            if (m == 3) { value = 79170000000 + c; }
-            if (m == 4) { value = 79250000000 + c; }
-            if (m == 5) { value = 79260000000 + c; }
-            if (m == 6) { value = 79850000000 + c; }
-            if (m == 7) { value = 79770000000 + c; }
-            if (m == 8) { value = 79680000000 + c; }
+            if (m == 0) { value = 4950000000 + c + m1 * 10000000000;}
+            if (m == 1) { value = 4990000000 + c + m1 * 10000000000;}
+            if (m == 2) { value = 9160000000 + c + m1 * 10000000000;}
+            if (m == 3) { value = 9170000000 + c + m1 * 10000000000;}
+            if (m == 4) { value = 9250000000 + c + m1 * 10000000000;}
+            if (m == 5) { value = 9260000000 + c + m1 * 10000000000;}
+            if (m == 6) { value = 9850000000 + c + m1 * 10000000000;}
+            if (m == 7) { value = 9770000000 + c + m1 * 10000000000;}
+            if (m == 8) { value = 9680000000 + c + m1 * 10000000000;}
             //cout << " (" << value << ") \n";
 
             if (rand() % 2 == 0) {
