@@ -945,13 +945,7 @@ public:
                         if (cli.arr[0] != -1 && cli.arr[1] != -1 && cli.arr[2] != -1) { s++; cl.edit_cl1(cli.id, cli.arr); }
                         if (cli.number != -1) { s++;  cl.edit_cl1(cli.id, cli.number); }
                         if (n > 0) { s++;  cl.edit_cl1(cli.id, cli.prod); }
-                        if (s == 6) {
-                            cl2.add_cl(cli.surname, cli.name, cli.patronymic, cli.arr, cli.number, cli.prod);
-                            cl.edit_cl(cli.id,cli.surname, cli.name, cli.patronymic, cli.arr, cli.number, cli.prod);
-                            cout << "\n\n";
-                            cl2.print_base();
-                            cout << "\n";
-                        }
+                        
                     }
 
                 }
