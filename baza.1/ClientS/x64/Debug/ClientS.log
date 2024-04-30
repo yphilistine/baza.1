@@ -1,0 +1,3 @@
+﻿  ClientS.cpp
+C:\Users\ANDREY\source\repos\ClientS\ClientS\ClientS.cpp(50,16): warning C4267: инициализация: преобразование из "size_t" в "int"; возможна потеря данных
+  ClientS.vcxproj -> C:\Users\ANDREY\source\repos\ClientS\x64\Debug\ClientS.exe
