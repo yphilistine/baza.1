@@ -7,9 +7,12 @@
 #include <fstream>
 #include <iomanip>
 #include <algorithm>
+#include <cstdio>
+#include <stdio.h>
 using namespace std; 
 
 
+#pragma warning(disable: 4996)
 
 
 struct client {
@@ -27,6 +30,18 @@ struct client {
             arr[i] = _arr[i];
         }
         prod = _prod;
+    }
+
+    void print() {
+        cout << surname << " " << name << " " << patronymic << " ";
+        for (int i = 0; i < 3; i++) {
+            cout << arr[i] << ".";
+        }
+        cout << " \n" << number << " " << id << "\n";
+        for (auto it = prod.begin(); it != prod.end(); it++) {
+            cout << *it << " ";
+        };
+        cout << endl << endl;
     }
 
 };
@@ -108,8 +123,9 @@ public:
     //editing metods
 
     void add_cl(const string& surname, const string& name, const string& patronymic, const int arr[3], const long long int number, const vector<double> prod) {
-        client cl(id_next,surname, name, patronymic, arr, number, prod);
-        if (safe_add(cl) !=6 ){clients.push_back(client(id_next++, surname, name, patronymic, arr, number, prod)); }
+        client cl(id_next, surname, name, patronymic, arr, number, prod); //cl.print();
+        if (safe_add(cl) != 6) { clients.push_back(client(id_next++, surname, name, patronymic, arr, number, prod)); }
+        //clients.push_back(client(id_next++, surname, name, patronymic, arr, number, prod));
     }
 
     
@@ -263,21 +279,41 @@ public:
         }
     };
 
-    void print_base_file(const string& filename) {
+    /*void print_base_file(FILE* filename) {
+        setlocale(LC_ALL, "Russian");
+        for (auto& client : clients) {
+            fprintf(filename, "%s %s %s ", client.surname, client.name, client.patronymic);
+            for (int i = 0; i < 3; i++) {
+                fprintf(filename, "%d.", client.arr[i]);
+            }
+            fprintf(filename, "     %d", client.id);
+            fprintf(filename, "\n%lld\n", client.number);
+            
+            for (auto it = client.prod.begin(); it != client.prod.end(); it++) {
+                fprintf(filename, "%lf", *it);
+            };
+            fprintf(filename, "\n (sum: %10lf  avg spent: %10lf) ", sumpr(client), avgpr(client));
+            fprintf(filename,"\n\n");
+            //setprecision(10)
+        }
+ 
+    }*/
+
+    void print_base_file(FILE* filename) {
         ofstream file(filename);
         for (auto& client : clients) {
             file << client.surname << " " << client.name << " " << client.patronymic << " ";
             for (int i = 0; i < 3; i++) {
                 file << client.arr[i] << ".";
             }
-            file << " \n" << client.number<<"\n";
+            file << " \n" << client.number << "    " << client.id << "\n";
             for (auto it = client.prod.begin(); it != client.prod.end(); it++) {
-                 file << *it << " ";
+                file << *it << " ";
             };
             file << setprecision(10) << "\n (sum: " << sumpr(client) << "  avg spent:" << avgpr(client) << ")";
             file << endl << endl;
         }
-        file.close();
+        
     }
 
     //......................................................................................................................................
@@ -706,7 +742,7 @@ public:
     }
 
     int safe_add(client cl) {
-        int m=0;
+        int m = 0;
         for (auto it = clients.begin(); it != clients.end(); it++) {
             int i = 0;
             if (it->number == cl.number) { i++;}
@@ -716,6 +752,8 @@ public:
             if (dt(*it) == dt(cl)) { i++;}
             if (it->prod == cl.prod) { i++;}
             if (i > m) { m = i; }
+            client cl1 = *it;
+            //if (i == 6) { cl1.print(); cout << "("; cl.print(); cout << ")"; }
         }
         return m;
     }
@@ -730,16 +768,16 @@ public:
         if (c >= -32 && c <= -17) { c = c + 16; return; }
     }
 
-    void imput(client_data clien) {
-        vector<string> com = { "edit","delete","print","sort","select","generate","correct","add","break" };
+    void imput(client_data &clien, FILE* output, FILE* input) {
+        vector<string> com = { "edit","delete","print","sort","select","generate","correct","add","break",""};
         vector<string> sortcase = { "date","dt","num","number","avg","average","sum","summ" };
         int br = 0, st = 0, cas = -1, st1 = 0, sortcas = -1;
-        char c; scanf_s("%c", &c,1);//10 enter 32 space 40 ( 41 ) 47 / 44 , 38 & 46 . 124 | 61 =
-        double b;
+        char c=0; //10 enter 32 space 40 ( 41 ) 47 / 44 , 38 & 46 . 124 | 61 =
+        double b = 0;
         int count = 0;
         client_data cl = clien;
 
-        while (st1 == 0 && count < 50) {
+        while (st1 == 0 && count < 500) {
             count++;
             //char c11 = -52;
             //cout << "cicle";
@@ -757,21 +795,22 @@ public:
             int brek = 0;
             string sortc = "";
             client cli(1,surname,name,patron,arr,num,prod);
-
-            scanf_s("%c", &c, 1);
+            
+            fscanf(input, "%c", &c);
             cas = -1; st1 = 0;
-            for (i = 0; (i < 255) && ((c == 10) || (c == 32)); i++) {
-                scanf_s("%c", &c, 1);
+            for (i = 0; (i < 255) && ((c == 10) || (c == 32) || (c==-52)); i++) {
+                fscanf(input,"%c", &c);
                 if (i == 254) { st = 1; };
             }
+           
             if (st == 0) {
                 for (int k = 0; (k < 255) && (c > 96) && (c < 123); k++) {
-                    imp.append(1, c); scanf_s("%c", &c, 1);
+                    imp.append(1, c); fscanf_s(input, "%c", &c, 1);
                 }
 
                 //for (i = 0; i < size(imp); i++) {cout << imp[i];}
 
-                for (i = 0; i < 9; i++) {
+                for (i = 0; i < 10; i++) {
                     if (imp == com[i]) { cas = i; }
                 }
                 //cout << cas << "\n";
@@ -780,10 +819,10 @@ public:
                     setlocale(LC_ALL, "Russian"); st = 0;
                     n = 0; s = 0; zskob = 0; st = 0;
                     if (c == 40) {
-                        s = scanf_s("%d", &n);
-                        scanf_s("%c", &c, 1);
+                        s = fscanf_s(input,"%d", &n);
+                        fscanf_s(input, "%c", &c, 1);
                         for (int k = 0; (k < 30) && (c == 32); k++) {
-                            scanf_s("%c", &c, 1);
+                            fscanf_s(input, "%c", &c, 1);
                             if (k == 29) { st = 1; }
                         }
                         if (s != 0 && c == 41) {
@@ -791,28 +830,28 @@ public:
                         }
                     }
                     n = 0; s = 0; p = 0; fskob = 0;
-                    scanf_s("%c", &c, 1);
+                    fscanf_s(input, "%c", &c, 1);
                     if (c == 40) {
                         //cout << "(skob1)";
-                        scanf_s("%c", &c, 1); pl = c;
+                        fscanf_s(input, "%c", &c, 1); pl = c;
                         for (int k = 0; (k < 255) && (((c > -33) && (c < -15)) || ((c > -129) && (c < -80))); k++) {
-                            fixchar(c);  surname.append(1, c); scanf_s("%c", &c, 1); s = 1;
+                            fixchar(c);  surname.append(1, c); fscanf_s(input, "%c", &c, 1); s = 1;
                         }
                         if (c == 44) {
                             //cout << "(zap1)";
-                            scanf_s("%c", &c, 1);
+                            fscanf_s(input, "%c", &c, 1);
                             for (int k = 0; (k < 255) && (((c > -33) && (c < -15)) || ((c > -129) && (c < -80))); k++) {
-                                fixchar(c);  name.append(1, c); scanf_s("%c", &c, 1); n = 1;
+                                fixchar(c);  name.append(1, c); fscanf_s(input, "%c", &c, 1); n = 1;
                             }
                             if (c == 44) {
                                 //cout << "(zap2)";
-                                scanf_s("%c", &c, 1);
+                                fscanf_s(input, "%c", &c, 1);
                                 for (int k = 0; (k < 255) && (((c > -33) && (c < -15)) || ((c > -129) && (c < -80))); k++) {
-                                    fixchar(c);  patron.append(1, c); scanf_s("%c", &c, 1); p = 1;
+                                    fixchar(c);  patron.append(1, c); fscanf_s(input, "%c", &c, 1); p = 1;
                                 }
 
                                 for (int k = 0; (k < 30) && (c == 32); k++) {
-                                    scanf_s("%c", &c, 1);
+                                    fscanf_s(input, "%c", &c, 1);
                                     if (k == 29) { st = 1; }
                                 }
 
@@ -836,18 +875,18 @@ public:
 
                     }
                     n = 0; s = 0; p = 0; sskob = 0;
-                    scanf_s("%c", &c, 1);
+                    fscanf_s(input, "%c", &c, 1);
                     if (c == 40) {
                         //cout << "(skob1)";
-                        n = scanf_s("%lld", &num);
-                        scanf_s("%c", &c, 1);
+                        n = fscanf_s(input,"%lld", &num);
+                        fscanf_s(input, "%c", &c, 1);
 
                         if (n != 0) { cli.number = num; }
                         n = 0;
                         num = -1;
 
                         for (int k = 0; (k < 30) && (c == 32); k++) {
-                            scanf_s("%c", &c, 1);
+                            fscanf_s(input, "%c", &c, 1);
                             if (k == 29) { st = 1; }
                         }
 
@@ -858,33 +897,33 @@ public:
                     }
                     n = 0; s = 0; p = 0; n1 = 0; s1 = 0; p1 = 0; thskob = 0;
                     brek = 0;
-                    scanf_s("%c", &c, 1);
+                    fscanf_s(input, "%c", &c, 1);
                     if (c == 40) {
-                        n = scanf_s("%d", &day);
-                        scanf_s("%c", &c, 1);
+                        n = fscanf_s(input,"%d", &day);
+                        fscanf_s(input, "%c", &c, 1);
 
                         for (int k = 0; (k < 30) && (c == 32); k++) {
-                            scanf_s("%c", &c, 1);
+                            fscanf_s(input, "%c", &c, 1);
                             if (k == 29) { st = 1; }
                         }
 
                         if (c == 46) {
 
-                            p = scanf_s("%d", &month);
-                            scanf_s("%c", &c, 1);
+                            p = fscanf_s(input,"%d", &month);
+                            fscanf_s(input, "%c", &c, 1);
 
                             for (int k = 0; (k < 30) && (c == 32); k++) {
-                                scanf_s("%c", &c, 1);
+                                fscanf_s(input, "%c", &c, 1);
                                 if (k == 29) { st = 1; }
                             }
 
                             if (c == 46) {
 
-                                s = scanf_s("%d", &year);
-                                scanf_s("%c", &c, 1);
+                                s = fscanf_s(input,"%d", &year);
+                                fscanf_s(input, "%c", &c, 1);
 
                                 for (int k = 0; (k < 30) && (c == 32); k++) {
-                                    scanf_s("%c", &c, 1);
+                                    fscanf_s(input, "%c", &c, 1);
                                     if (k == 29) { st = 1; }
                                 }
 
@@ -910,23 +949,23 @@ public:
                     }
                     n = 0; s = 0; p = 0; n1 = 0; s1 = 0; p1 = 0; foskob = 0;
                     brek = 0; pr = 0;
-                    scanf_s("%c", &c, 1);
+                    fscanf_s(input, "%c", &c, 1);
                     if (c == 40) {
 
-                        n = scanf_s("%lf", &pr);
+                        n = fscanf_s(input,"%lf", &pr);
                         if (n != 0) { prod.push_back(pr); }
 
                         while (brek != -1) {
-                            scanf_s("%c", &c, 1);
+                            fscanf_s(input, "%c", &c, 1);
 
                             for (int k = 0; (k < 30) && (c == 32); k++) {
-                                scanf_s("%c", &c, 1);
+                                fscanf_s(input, "%c", &c, 1);
                                 if (k == 29) { st = 1; }
                             }
 
                             if (c == 124) {
 
-                                n = scanf_s("%lf", &pr);
+                                n = fscanf_s(input,"%lf", &pr);
                                 if (n != 0) {
                                     prod.push_back(pr);
                                 }
@@ -954,44 +993,44 @@ public:
                     setlocale(LC_ALL, "Russian");
                     n = 0; s = 0; zskob = 1; st = 0;
                     if (c == 40) {
-                        s = scanf_s("%d", &n);
-                        scanf_s("%c", &c, 1);
+                        s = fscanf_s(input, "%d", &n);
+                        fscanf_s(input, "%c", &c, 1);
                         for (int k = 0; (k < 30) && (c == 32); k++) {
-                            scanf_s("%c", &c, 1);
+                            fscanf_s(input, "%c", &c, 1);
                             if (k == 29) { st = 1; }
                         }
                         if (s != 0 && c == 41) {
                             cl2 = cl.select_0(n);
-                            cout << "\n\n";
-                            cl2.print_base();
-                            cout << "\n";
+                            fprintf(output,"\n\n");
+                            cl2.print_base_file(output);
+                            fprintf(output,"\n");
                             cl.delete_cl(n); n = 0; 
                             zskob = 0; //cout << "";
                         }
                     }
                     n = 0; s = 0; p = 0;fskob = 0;
-                    scanf_s("%c", &c, 1);
+                    fscanf_s(input, "%c", &c, 1);
                     if (c == 40) {
                         //cout << "(skob1)";
-                        scanf_s("%c", &c, 1); pl = c;
+                        fscanf_s(input, "%c", &c, 1); pl = c;
                         for (int k = 0; (k < 255) && (((c > -33) && (c < -15)) || ((c > -129) && (c < -80))); k++) {
-                            fixchar(c);  surname.append(1, c); scanf_s("%c", &c, 1); s = 1;
+                            fixchar(c);  surname.append(1, c); fscanf_s(input, "%c", &c, 1); s = 1;
                         }
                         if (c == 44) {
                             //cout << "(zap1)";
-                            scanf_s("%c", &c,1);
+                            fscanf_s(input,"%c", &c,1);
                             for (int k = 0; (k < 255) && (((c > -33) && (c < -15)) || ((c > -129) && (c < -80))); k++) {
-                                fixchar(c);  name.append(1, c); scanf_s("%c", &c, 1); n = 1;
+                                fixchar(c);  name.append(1, c); fscanf_s(input, "%c", &c, 1); n = 1;
                             }
                             if (c == 44) {
                                 //cout << "(zap2)";
-                                scanf_s("%c", &c,1);
+                                fscanf_s(input,"%c", &c,1);
                                 for (int k = 0; (k < 255) && (((c > -33) && (c < -15)) || ((c > -129) && (c < -80))); k++) {
-                                    fixchar(c);  patron.append(1, c); scanf_s("%c", &c, 1); p = 1;
+                                    fixchar(c);  patron.append(1, c); fscanf_s(input, "%c", &c, 1); p = 1;
                                 }
 
                                 for (int k = 0; (k < 30) && (c == 32); k++) {
-                                    scanf_s("%c", &c, 1);
+                                    fscanf_s(input, "%c", &c, 1);
                                     if (k == 29) { st = 1; }
                                 }
 
@@ -1015,18 +1054,18 @@ public:
 
                     }
                     n = 0; s = 0; p = 0; sskob = 0;
-                    scanf_s("%c", &c, 1);
+                    fscanf_s(input, "%c", &c, 1);
                     if (c == 40) {
                         //cout << "(skob1)";
-                        n = scanf_s("%lld", &num);
-                        scanf_s("%c", &c,1);
+                        n = fscanf_s(input, "%lld", &num);
+                        fscanf_s(input, "%c", &c,1);
 
                         if (n != 0) { cli.number = num; }
                         n = 0;
                         num = -1;
 
                         for (int k = 0; (k < 30) && (c == 32); k++) {
-                            scanf_s("%c", &c,1);
+                            fscanf_s(input, "%c", &c,1);
                             if (k == 29) { st = 1; }
                         }
 
@@ -1037,33 +1076,33 @@ public:
                     }
                     n = 0; s = 0; p = 0; n1 = 0; s1 = 0; p1 = 0; thskob = 0;
                     brek = 0;
-                    scanf_s("%c", &c, 1);
+                    fscanf_s(input, "%c", &c, 1);
                     if (c == 40) {
-                        n = scanf_s("%d", &day);
-                        scanf_s("%c", &c,1);
+                        n = fscanf_s(input,"%d", &day);
+                        fscanf_s(input,"%c", &c,1);
 
                         for (int k = 0; (k < 30) && (c == 32); k++) {
-                            scanf_s("%c", &c,1);
+                            fscanf_s(input,"%c", &c,1);
                             if (k == 29) { st = 1; }
                         }
 
                         if (c == 46) {
 
-                            p = scanf_s("%d", &month);
-                            scanf_s("%c", &c,1);
+                            p = fscanf_s(input,"%d", &month);
+                            fscanf_s(input,"%c", &c,1);
 
                             for (int k = 0; (k < 30) && (c == 32); k++) {
-                                scanf_s("%c", &c,1);
+                                fscanf_s(input,"%c", &c,1);
                                 if (k == 29) { st = 1; }
                             }
 
                             if (c == 46) {
 
-                                s = scanf_s("%d", &year);
-                                scanf_s("%c", &c,1);
+                                s = fscanf_s(input,"%d", &year);
+                                fscanf_s(input,"%c", &c,1);
 
                                 for (int k = 0; (k < 30) && (c == 32); k++) {
-                                    scanf_s("%c", &c,1);
+                                    fscanf_s(input,"%c", &c,1);
                                     if (k == 29) { st = 1; }
                                 }
 
@@ -1089,23 +1128,23 @@ public:
                     }
                     n = 0; s = 0; p = 0; n1 = 0; s1 = 0; p1 = 0; foskob = 0;
                     brek = 0; pr = 0;
-                    scanf_s("%c", &c, 1);
+                    fscanf_s(input, "%c", &c, 1);
                     if (c == 40) {
 
-                        n = scanf_s("%lf", &pr);
+                        n = fscanf_s(input,"%lf", &pr);
                         if (n != 0) { prod.push_back(pr); }
 
                         while (brek != -1) {
-                            scanf_s("%c", &c, 1);
+                            fscanf_s(input, "%c", &c, 1);
 
                             for (int k = 0; (k < 30) && (c == 32); k++) {
-                                scanf_s("%c", &c, 1);
+                                fscanf_s(input, "%c", &c, 1);
                                 if (k == 29) { st = 1; }
                             }
 
                             if (c == 124) {
                                 
-                                n = scanf_s("%lf", &pr);
+                                n = fscanf_s(input,"%lf", &pr);
                                 if (n != 0) {
                                     prod.push_back(pr);
                                 }
@@ -1125,9 +1164,9 @@ public:
                         if (cli.number != -1) { cl2 = cl2.select_(cli.number); s++; }
                         if ( n > 0) { cl2 = cl2.select_(cli.prod); s++;}
                         if (s != 0) {
-                            cout << "\n\n";
-                            cl2.print_base();
-                            cout << "\n";
+                            fprintf(output, "\n\n");
+                            cl2.print_base_file(output);
+                            fprintf(output, "\n");
                             for (auto it = cl2.clients.begin(); it != cl2.clients.end(); it++) {
                                 cl.delete_cl(it->surname, it->name, it->patronymic, it->arr, it->number, it->prod);
                                 //cout << it->surname << " " << it->name << " " << it->patronymic << it->arr << " " << it->number << " ";
@@ -1139,12 +1178,11 @@ public:
 
                 if (cas == 2) {
                     if (c == 40) {
-                        scanf_s("%c", &c,1);
+                        fscanf_s(input,"%c", &c,1);
                         if (c == 41) {
-                            cout << "\n\n";
-                            cl.print_base();
-                            cl.print_base_file("out");
-                            cout << "\n";
+                            fprintf(output, "\n\n");
+                            cl.print_base_file(output);
+                            fprintf(output, "\n");
                         }
                     }
                 }
@@ -1152,13 +1190,13 @@ public:
                 if (cas == 3) {
                     sortcas = 0;
                     if (c == 40) {
-                        scanf_s("%c", &c, 1);
+                        fscanf_s(input, "%c", &c, 1);
                         for (int k = 0; (k < 30) && (c == 32); k++) {
-                            scanf_s("%c", &c, 1);
+                            fscanf_s(input, "%c", &c, 1);
                             if (k == 29) { st = 1; }
                         }
                         for (int k = 0; (k < 255) && (c > 96) && (c < 123); k++) {
-                            sortc.append(1, c); scanf_s("%c", &c, 1);
+                            sortc.append(1, c); fscanf_s(input, "%c", &c, 1);
                         }
                         if (c == 41) {
                             //for (i = 0; i < size(sortc); i++) { cout << sortc[i]; }
@@ -1179,12 +1217,12 @@ public:
                                 cl.sortby_spendings();
                             }
                             if (sortcas == -1) {
-                                cout << "\nnot a sorting space\n";
+                                fprintf(output, "\nnot a sorting space\n");
                             }
 
-                            cout << "\n\n";
-                            cl.print_base();
-                            cout << "\n";
+                            fprintf(output, "\n\n");
+                            cl.print_base_file(output);
+                            fprintf(output, "\n");
                         }
                     }
                 }
@@ -1194,25 +1232,25 @@ public:
                     cl3 = cl; cl2 = cl; fskob = 0; st = 0;
                     if (c == 40) {
                         //cout << "(skob1)";
-                        scanf_s("%c", &c,1); pl = c;
+                        fscanf_s(input,"%c", &c,1); pl = c;
                         for (int k = 0; (k < 255) && (((c > -33) && (c < -15)) || ((c > -129) && (c < -80))); k++) {
-                            fixchar(c);  surname.append(1, c); scanf_s("%c", &c,1); s = 1;
+                            fixchar(c);  surname.append(1, c); fscanf_s(input,"%c", &c,1); s = 1;
                         }
                         if (c == 44) {
                             //cout << "(zap1)";
-                            scanf_s("%c", &c,1);
+                            fscanf_s(input,"%c", &c,1);
                             for (int k = 0; (k < 255) && (((c > -33) && (c < -15)) || ((c > -129) && (c < -80))); k++) {
-                                fixchar(c);  name.append(1, c); scanf_s("%c", &c,1); n = 1;
+                                fixchar(c);  name.append(1, c); fscanf_s(input,"%c", &c,1); n = 1;
                             }
                             if (c == 44) {
                                 //cout << "(zap2)";
-                                scanf_s("%c", &c,1);
+                                fscanf_s(input,"%c", &c,1);
                                 for (int k = 0; (k < 255) && (((c > -33) && (c < -15)) || ((c > -129) && (c < -80))); k++) {
-                                    fixchar(c);  patron.append(1, c); scanf_s("%c", &c,1); p = 1;
+                                    fixchar(c);  patron.append(1, c); fscanf_s(input,"%c", &c,1); p = 1;
                                 }
 
                                 for (int k = 0; (k < 30) && (c == 32); k++) {
-                                    scanf_s("%c", &c,1);
+                                    fscanf_s(input,"%c", &c,1);
                                     if (k == 29) { st = 1; }
                                 }
 
@@ -1233,34 +1271,34 @@ public:
                                         //...................................................................................................
                                         cl3 = cl;
 
-                                        scanf_s("%c", &c,1);
+                                        fscanf_s(input,"%c", &c,1);
 
                                         if (c == 32) {
                                             for (int k = 0; (k < 30) && (c == 32); k++) {
-                                                scanf_s("%c", &c,1);
+                                                fscanf_s(input,"%c", &c,1);
                                                 if (k == 29) { st = 1; }
                                             }
                                         }
 
                                         //pl = c; cout <<"("<< pl<<")";
                                         for (int k = 0; (k < 255) && (((c > -33) && (c < -15)) || ((c > -129) && (c < -80))); k++) {
-                                            fixchar(c);  surname.append(1, c); scanf_s("%c", &c,1); s = 1; //cout << "(2)";
+                                            fixchar(c);  surname.append(1, c); fscanf_s(input,"%c", &c,1); s = 1; //cout << "(2)";
                                         }
                                         if (c == 44) {
                                             //cout << "zap3";
-                                            scanf_s("%c", &c,1);
+                                            fscanf_s(input,"%c", &c,1);
                                             for (int k = 0; (k < 255) && (((c > -33) && (c < -15)) || ((c > -129) && (c < -80))); k++) {
-                                                fixchar(c);   name.append(1, c); scanf_s("%c", &c,1); n = 1; //cout << "(3)";
+                                                fixchar(c);   name.append(1, c); fscanf_s(input,"%c", &c,1); n = 1; //cout << "(3)";
                                             }
                                             if (c == 44) {
                                                 //cout << "zap4";
-                                                scanf_s("%c", &c,1);
+                                                fscanf_s(input,"%c", &c,1);
                                                 for (int k = 0; (k < 255) && (((c > -33) && (c < -15)) || ((c > -129) && (c < -80))); k++) {
-                                                    fixchar(c);   patron.append(1, c); scanf_s("%c", &c,1); p = 1; //cout << "(4)";
+                                                    fixchar(c);   patron.append(1, c); fscanf_s(input,"%c", &c,1); p = 1; //cout << "(4)";
                                                 }
 
                                                 for (int k = 0; (k < 30) && (c == 32); k++) {
-                                                    scanf_s("%c", &c,1);
+                                                    fscanf_s(input,"%c", &c,1);
                                                     if (k == 29) { st = 1; }
                                                 }
 
@@ -1280,31 +1318,31 @@ public:
                                         if (c == 38) {
                                             //cout << 2;
                                             //....................................................................................................
-                                            scanf_s("%c", &c,1);
+                                            fscanf_s(input,"%c", &c,1);
 
                                             if (c == 32) {
                                                 for (int k = 0; (k < 30) && (c == 32); k++) {
-                                                    scanf_s("%c", &c,1);
+                                                    fscanf_s(input,"%c", &c,1);
                                                     if (k == 29) { st = 1; }
                                                 }
                                             }
 
                                             for (int k = 0; (k < 255) && (((c > -33) && (c < -15)) || ((c > -129) && (c < -80))); k++) {
-                                                fixchar(c);  surname.append(1, c); scanf_s("%c", &c,1); s = 1;
+                                                fixchar(c);  surname.append(1, c); fscanf_s(input,"%c", &c,1); s = 1;
                                             }
                                             if (c == 44) {
-                                                scanf_s("%c", &c,1);
+                                                fscanf_s(input,"%c", &c,1);
                                                 for (int k = 0; (k < 255) && (((c > -33) && (c < -15)) || ((c > -129) && (c < -80))); k++) {
-                                                    fixchar(c);  name.append(1, c); scanf_s("%c", &c,1); n = 1;
+                                                    fixchar(c);  name.append(1, c); fscanf_s(input,"%c", &c,1); n = 1;
                                                 }
                                                 if (c == 44) {
-                                                    scanf_s("%c", &c,1);
+                                                    fscanf_s(input,"%c", &c,1);
                                                     for (int k = 0; (k < 255) && (((c > -33) && (c < -15)) || ((c > -129) && (c < -80))); k++) {
-                                                        fixchar(c);  patron.append(1, c); scanf_s("%c", &c,1); p = 1;
+                                                        fixchar(c);  patron.append(1, c); fscanf_s(input,"%c", &c,1); p = 1;
                                                     }
 
                                                     for (int k = 0; (k < 30) && (c == 32); k++) {
-                                                        scanf_s("%c", &c,1);
+                                                        fscanf_s(input,"%c", &c,1);
                                                         if (k == 29) { st = 1; }
                                                     }
 
@@ -1336,21 +1374,21 @@ public:
 
                     }
                     brek = 0; sskob = 0; cl3 = cl2; cl4 = cl2;
-                    scanf_s("%c", &c, 1);
+                    fscanf_s(input, "%c", &c, 1);
                     if (c == 40) {
                         //cout << "(skob1)";
-                        n = scanf_s("%lld", &num);
-                        scanf_s("%c", &c,1);
+                        n = fscanf_s(input,"%lld", &num);
+                        fscanf_s(input,"%c", &c,1);
 
                         for (int k = 0; (k < 30) && (c == 32); k++) {
-                            scanf_s("%c", &c,1);
+                            fscanf_s(input,"%c", &c,1);
                             if (k == 29) { st = 1; }
                         }
 
                         if (c == 44 && n == 1) {
                             // cout << "(zap1)";
-                            p = scanf_s("%lld", &num1);
-                            scanf_s("%c", &c,1);
+                            p = fscanf_s(input,"%lld", &num1);
+                            fscanf_s(input,"%c", &c,1);
 
                             if (p == 0) { cl3 = cl3.select_(num); }
                             if (p == 1) { cl3 = cl3.select_(num, num1); } n = 0;  p = 0;
@@ -1359,7 +1397,7 @@ public:
                             cl2 = cl3;
 
                             for (int k = 0; (k < 30) && (c == 32); k++) {
-                                scanf_s("%c", &c,1);
+                                fscanf_s(input,"%c", &c,1);
                                 if (k == 29) { st = 1; }
                             }
 
@@ -1371,18 +1409,18 @@ public:
                                     //...................................................................................................
                                     cl3 = cl4;
 
-                                    n = scanf_s("%lld", &num);
-                                    scanf_s("%c", &c,1);
+                                    n = fscanf_s(input,"%lld", &num);
+                                    fscanf_s(input,"%c", &c,1);
 
                                     for (int k = 0; (k < 30) && (c == 32); k++) {
-                                        scanf_s("%c", &c,1);
+                                        fscanf_s(input,"%c", &c,1);
                                         if (k == 29) { st = 1; }
                                     }
 
                                     if (c == 44 && n == 1) {
                                         //cout << "zap2";
-                                        p = scanf_s("%lld", &num1);
-                                        scanf_s("%c", &c,1);
+                                        p = fscanf_s(input,"%lld", &num1);
+                                        fscanf_s(input,"%c", &c,1);
 
                                         //cout << " "; for (int k = 0; k < size(name); k++) { cout << name[k]; } cout << " ";
                                         if (p == 0) { cl3 = cl3.select_(num); }
@@ -1392,7 +1430,7 @@ public:
                                         cl3.additself(cl2);//cout << 4;
 
                                         for (int k = 0; (k < 30) && (c == 32); k++) {
-                                            scanf_s("%c", &c,1);
+                                            fscanf_s(input,"%c", &c,1);
                                             if (k == 29) { st = 1; }
                                         }
 
@@ -1405,18 +1443,18 @@ public:
                                         //...................................................................................................
                                         cl3 = cl2;
 
-                                        n = scanf_s("%lld", &num);
-                                        scanf_s("%c", &c,1);
+                                        n = fscanf_s(input,"%lld", &num);
+                                        fscanf_s(input,"%c", &c,1);
 
                                         for (int k = 0; (k < 30) && (c == 32); k++) {
-                                            scanf_s("%c", &c,1);
+                                            fscanf_s(input,"%c", &c,1);
                                             if (k == 29) { st = 1; }
                                         }
 
                                         if (c == 44 && n == 1) {
                                             cout << "zap2";
-                                            p = scanf_s("%lld", &num1);
-                                            scanf_s("%c", &c,1);
+                                            p = fscanf_s(input,"%lld", &num1);
+                                            fscanf_s(input,"%c", &c,1);
 
                                             //cout << " "; for (int k = 0; k < size(name); k++) { cout << name[k]; } cout << " ";
                                             if (p == 0) { cl3 = cl3.select_(num); }
@@ -1426,7 +1464,7 @@ public:
                                             cl2 = cl3; //cout << 4;
 
                                             for (int k = 0; (k < 30) && (c == 32); k++) {
-                                                scanf_s("%c", &c,1);
+                                                fscanf_s(input,"%c", &c,1);
                                                 if (k == 29) { st = 1; }
                                             }
 
@@ -1450,61 +1488,61 @@ public:
                     }
                     n = 0; s = 0; p = 0; n1 = 0; s1 = 0; p1 = 0; thskob = 0;
                     cl3 = cl2; cl4 = cl2; brek = 0;
-                    scanf_s("%c", &c, 1);
+                    fscanf_s(input, "%c", &c, 1);
                     if (c == 40) {
-                        n = scanf_s("%d", &day);
-                        scanf_s("%c", &c,1);
+                        n = fscanf_s(input,"%d", &day);
+                        fscanf_s(input,"%c", &c,1);
 
                         for (int k = 0; (k < 30) && (c == 32); k++) {
-                            scanf_s("%c", &c,1);
+                            fscanf_s(input,"%c", &c,1);
                             if (k == 29) { st = 1; }
                         }
 
                         if (c == 46) {
 
-                            p = scanf_s("%d", &month);
-                            scanf_s("%c", &c,1);
+                            p = fscanf_s(input,"%d", &month);
+                            fscanf_s(input,"%c", &c,1);
 
                             for (int k = 0; (k < 30) && (c == 32); k++) {
-                                scanf_s("%c", &c,1);
+                                fscanf_s(input,"%c", &c,1);
                                 if (k == 29) { st = 1; }
                             }
 
                             if (c == 46) {
 
-                                s = scanf_s("%d", &year);
-                                scanf_s("%c", &c,1);
+                                s = fscanf_s(input,"%d", &year);
+                                fscanf_s(input,"%c", &c,1);
 
                                 for (int k = 0; (k < 30) && (c == 32); k++) {
-                                    scanf_s("%c", &c,1);
+                                    fscanf_s(input,"%c", &c,1);
                                     if (k == 29) { st = 1; }
                                 }
 
                                 if (c == 44) {
 
-                                    n1 = scanf_s("%d", &day1);
-                                    scanf_s("%c", &c,1);
+                                    n1 = fscanf_s(input,"%d", &day1);
+                                    fscanf_s(input,"%c", &c,1);
 
                                     for (int k = 0; (k < 30) && (c == 32); k++) {
-                                        scanf_s("%c", &c,1);
+                                        fscanf_s(input,"%c", &c,1);
                                         if (k == 29) { st = 1; }
                                     }
 
                                     if (c == 46) {
-                                        p1 = scanf_s("%d", &month1);
-                                        scanf_s("%c", &c,1);
+                                        p1 = fscanf_s(input,"%d", &month1);
+                                        fscanf_s(input,"%c", &c,1);
 
                                         for (int k = 0; (k < 30) && (c == 32); k++) {
-                                            scanf_s("%c", &c,1);
+                                            fscanf_s(input,"%c", &c,1);
                                             if (k == 29) { st = 1; }
                                         }
 
                                         if (c == 46) {
-                                            s1 = scanf_s("%d", &year1);
-                                            scanf_s("%c", &c,1);
+                                            s1 = fscanf_s(input,"%d", &year1);
+                                            fscanf_s(input,"%c", &c,1);
 
                                             for (int k = 0; (k < 30) && (c == 32); k++) {
-                                                scanf_s("%c", &c,1);
+                                                fscanf_s(input,"%c", &c,1);
                                                 if (k == 29) { st = 1; }
                                             }
                                             //cout << 3;
@@ -1538,56 +1576,56 @@ public:
                                         brek = 0;
                                         if (c == 47) {
                                             cl3 = cl4;
-                                            n = scanf_s("%d", &day);
-                                            scanf_s("%c", &c,1);
+                                            n = fscanf_s(input,"%d", &day);
+                                            fscanf_s(input,"%c", &c,1);
 
                                             for (int k = 0; (k < 30) && (c == 32); k++) {
-                                                scanf_s("%c", &c,1);
+                                                fscanf_s(input,"%c", &c,1);
                                                 if (k == 29) { st = 1; }
                                             }
 
                                             if (c == 46) {
-                                                p = scanf_s("%d", &month);
-                                                scanf_s("%c", &c,1);
+                                                p = fscanf_s(input,"%d", &month);
+                                                fscanf_s(input,"%c", &c,1);
 
                                                 for (int k = 0; (k < 30) && (c == 32); k++) {
-                                                    scanf_s("%c", &c,1);
+                                                    fscanf_s(input,"%c", &c,1);
                                                     if (k == 29) { st = 1; }
                                                 }
 
                                                 if (c == 46) {
-                                                    s = scanf_s("%d", &year);
-                                                    scanf_s("%c", &c,1);
+                                                    s = fscanf_s(input,"%d", &year);
+                                                    fscanf_s(input,"%c", &c,1);
 
                                                     for (int k = 0; (k < 30) && (c == 32); k++) {
-                                                        scanf_s("%c", &c,1);
+                                                        fscanf_s(input,"%c", &c,1);
                                                         if (k == 29) { st = 1; }
                                                     }
 
                                                     if (c == 44) {
-                                                        n1 = scanf_s("%d", &day1);
-                                                        scanf_s("%c", &c,1);
+                                                        n1 = fscanf_s(input,"%d", &day1);
+                                                        fscanf_s(input,"%c", &c,1);
 
                                                         for (int k = 0; (k < 30) && (c == 32); k++) {
-                                                            scanf_s("%c", &c,1);
+                                                            fscanf_s(input,"%c", &c,1);
                                                             if (k == 29) { st = 1; }
                                                         }
 
                                                         if (c == 46) {
-                                                            p1 = scanf_s("%d", &month1);
-                                                            scanf_s("%c", &c,1);
+                                                            p1 = fscanf_s(input,"%d", &month1);
+                                                            fscanf_s(input,"%c", &c,1);
 
                                                             for (int k = 0; (k < 30) && (c == 32); k++) {
-                                                                scanf_s("%c", &c,1);
+                                                                fscanf_s(input,"%c", &c,1);
                                                                 if (k == 29) { st = 1; }
                                                             }
 
                                                             if (c == 46) {
-                                                                s1 = scanf_s("%d", &year1);
-                                                                scanf_s("%c", &c,1);
+                                                                s1 = fscanf_s(input,"%d", &year1);
+                                                                fscanf_s(input,"%c", &c,1);
 
                                                                 for (int k = 0; (k < 30) && (c == 32); k++) {
-                                                                    scanf_s("%c", &c,1);
+                                                                    fscanf_s(input,"%c", &c,1);
                                                                     if (k == 29) { st = 1; }
                                                                 }
                                                             }
@@ -1625,56 +1663,56 @@ public:
                                             cl3 = cl2;
                                             brek = brek - 1;
                                             if (c == 38) {
-                                                n = scanf_s("%d", &day);
-                                                scanf_s("%c", &c,1);
+                                                n = fscanf_s(input,"%d", &day);
+                                                fscanf_s(input,"%c", &c,1);
 
                                                 for (int k = 0; (k < 30) && (c == 32); k++) {
-                                                    scanf_s("%c", &c,1);
+                                                    fscanf_s(input,"%c", &c,1);
                                                     if (k == 29) { st = 1; }
                                                 }
 
                                                 if (c == 46) {
-                                                    p = scanf_s("%d", &month);
-                                                    scanf_s("%c", &c,1);
+                                                    p = fscanf_s(input,"%d", &month);
+                                                    fscanf_s(input,"%c", &c,1);
 
                                                     for (int k = 0; (k < 30) && (c == 32); k++) {
-                                                        scanf_s("%c", &c,1);
+                                                        fscanf_s(input,"%c", &c,1);
                                                         if (k == 29) { st = 1; }
                                                     }
 
                                                     if (c == 46) {
-                                                        s = scanf_s("%d", &year);
-                                                        scanf_s("%c", &c,1);
+                                                        s = fscanf_s(input,"%d", &year);
+                                                        fscanf_s(input,"%c", &c,1);
 
                                                         for (int k = 0; (k < 30) && (c == 32); k++) {
-                                                            scanf_s("%c", &c,1);
+                                                            fscanf_s(input,"%c", &c,1);
                                                             if (k == 29) { st = 1; }
                                                         }
 
                                                         if (c == 44) {
-                                                            n1 = scanf_s("%d", &day1);
-                                                            scanf_s("%c", &c,1);
+                                                            n1 = fscanf_s(input,"%d", &day1);
+                                                            fscanf_s(input,"%c", &c,1);
 
                                                             for (int k = 0; (k < 30) && (c == 32); k++) {
-                                                                scanf_s("%c", &c,1);
+                                                                fscanf_s(input,"%c", &c,1);
                                                                 if (k == 29) { st = 1; }
                                                             }
 
                                                             if (c == 46) {
-                                                                p1 = scanf_s("%d", &month1);
-                                                                scanf_s("%c", &c,1);
+                                                                p1 = fscanf_s(input,"%d", &month1);
+                                                                fscanf_s(input,"%c", &c,1);
 
                                                                 for (int k = 0; (k < 30) && (c == 32); k++) {
-                                                                    scanf_s("%c", &c,1);
+                                                                    fscanf_s(input,"%c", &c,1);
                                                                     if (k == 29) { st = 1; }
                                                                 }
 
                                                                 if (c == 46) {
-                                                                    s1 = scanf_s("%d", &year1);
-                                                                    scanf_s("%c", &c,1);
+                                                                    s1 = fscanf_s(input,"%d", &year1);
+                                                                    fscanf_s(input,"%c", &c,1);
 
                                                                     for (int k = 0; (k < 30) && (c == 32); k++) {
-                                                                        scanf_s("%c", &c,1);
+                                                                        fscanf_s(input,"%c", &c,1);
                                                                         if (k == 29) { st = 1; }
                                                                     }
 
@@ -1731,22 +1769,22 @@ public:
                         ///////
                     }
                     brek = 0; foskob = 0; cl3 = cl2; cl4 = cl2;
-                    scanf_s("%c", &c, 1);
+                    fscanf_s(input, "%c", &c, 1);
                     if (c == 40) {
                         //cout << "(skob1)";
-                        n = scanf_s("%lf", &avg);
-                        scanf_s("%c", &c, 1);
+                        n = fscanf_s(input,"%lf", &avg);
+                        fscanf_s(input, "%c", &c, 1);
                         //int p2 = c; cout << p2;
                         for (int k = 0; (k < 30) && (c == 32); k++) {
-                            scanf_s("%c", &c, 1);
+                            fscanf_s(input, "%c", &c, 1);
                             if (k == 29) { st = 1; }
                         }
 
                         if (c == 124 && n != 0) {
                             //cout << "(zap1)";
-                            p = scanf_s("%lf", &avg1);
+                            p = fscanf_s(input,"%lf", &avg1);
                             //cout << avg1;
-                            s = scanf_s("%c", &c, 1);
+                            s = fscanf_s(input, "%c", &c, 1);
                             //cout << "(" << s << ")";
 
                             if (p == 0) { cl3 = cl3.select_1(avg); }
@@ -1755,7 +1793,7 @@ public:
                             cl2 = cl3;
 
                             for (int k = 0; (k < 30) && (c == 32); k++) {
-                                scanf_s("%c", &c, 1);
+                                fscanf_s(input, "%c", &c, 1);
                                 if (k == 29) { st = 1; }
                             }
 
@@ -1768,19 +1806,19 @@ public:
                                     //...................................................................................................
                                     cl3 = cl4;
 
-                                    n = scanf_s("%lf", &avg);
-                                    scanf_s("%c", &c, 1);
+                                    n = fscanf_s(input,"%lf", &avg);
+                                    fscanf_s(input, "%c", &c, 1);
 
 
                                     for (int k = 0; (k < 30) && (c == 32); k++) {
-                                        scanf_s("%c", &c, 1);
+                                        fscanf_s(input, "%c", &c, 1);
                                         if (k == 29) { st = 1; }
                                     }
                                     //cout << c << avg;
                                     if (c == 124 && n != 0) {
                                         //cout << "zap2";
-                                        p = scanf_s("%lf", &avg1);
-                                        scanf_s("%c", &c, 1);
+                                        p = fscanf_s(input,"%lf", &avg1);
+                                        fscanf_s(input, "%c", &c, 1);
                                         //cout << avg1;
 
                                         //cout << " "; for (int k = 0; k < size(name); k++) { cout << name[k]; } cout << " ";
@@ -1790,7 +1828,7 @@ public:
                                         cl3.additself(cl2);//cout << 4;
 
                                         for (int k = 0; (k < 30) && (c == 32); k++) {
-                                            scanf_s("%c", &c, 1);
+                                            fscanf_s(input, "%c", &c, 1);
                                             if (k == 29) { st = 1; }
                                         }
 
@@ -1803,18 +1841,18 @@ public:
                                         //...................................................................................................
                                         cl3 = cl2;
 
-                                        n = scanf_s("%lf", &avg);
-                                        scanf_s("%c", &c, 1);
+                                        n = fscanf_s(input,"%lf", &avg);
+                                        fscanf_s(input, "%c", &c, 1);
 
                                         for (int k = 0; (k < 30) && (c == 32); k++) {
-                                            scanf_s("%c", &c, 1);
+                                            fscanf_s(input, "%c", &c, 1);
                                             if (k == 29) { st = 1; }
                                         }
 
                                         if (c == 124 && n != 0) {
                                             //cout << "zap2";
-                                            p = scanf_s("%lf", &avg1);
-                                            scanf_s("%c", &c, 1);
+                                            p = fscanf_s(input,"%lf", &avg1);
+                                            fscanf_s(input, "%c", &c, 1);
 
                                             //cout << " "; for (int k = 0; k < size(name); k++) { cout << name[k]; } cout << " ";
                                             if (p == 0) { cl3 = cl3.select_1(avg); }
@@ -1823,7 +1861,7 @@ public:
                                             cl2 = cl3; //cout << 4;
 
                                             for (int k = 0; (k < 30) && (c == 32); k++) {
-                                                scanf_s("%c", &c, 1);
+                                                fscanf_s(input, "%c", &c, 1);
                                                 if (k == 29) { st = 1; }
                                             }
 
@@ -1846,23 +1884,23 @@ public:
                         }
                     }
                     brek = 0; fiskob = 0; cl3 = cl2; cl4 = cl2;
-                    scanf_s("%c", &c, 1);
+                    fscanf_s(input, "%c", &c, 1);
                     if (c == 40) {
                         //cout << "(skob1)";
-                        n = scanf_s("%lf", &sum);
-                        scanf_s("%c", &c, 1);
+                        n = fscanf_s(input,"%lf", &sum);
+                        fscanf_s(input, "%c", &c, 1);
 
                         for (int k = 0; (k < 30) && (c == 32); k++) {
-                            scanf_s("%c", &c, 1);
+                            fscanf_s(input, "%c", &c, 1);
                             if (k == 29) { st = 1; }
                         }
                         int p2 = c; //cout << p2;
 
                         if (c == 124 && n != 0) {
                             //cout << "(zap1)";
-                            p = scanf_s("%lf", &sum1);
+                            p = fscanf_s(input,"%lf", &sum1);
                             //cout << sum1;
-                            scanf_s("%c", &c, 1);
+                            fscanf_s(input, "%c", &c, 1);
 
 
                             if (p == 0) { cl3 = cl3.select_(sum); }
@@ -1873,7 +1911,7 @@ public:
                             cl2 = cl3;
 
                             for (int k = 0; (k < 30) && (c == 32); k++) {
-                                scanf_s("%c", &c, 1);
+                                fscanf_s(input, "%c", &c, 1);
                                 if (k == 29) { st = 1; }
                             }
 
@@ -1885,18 +1923,18 @@ public:
                                     //...................................................................................................
                                     cl3 = cl4;
 
-                                    n = scanf_s("%lf", &sum);
-                                    scanf_s("%c", &c, 1);
+                                    n = fscanf_s(input,"%lf", &sum);
+                                    fscanf_s(input, "%c", &c, 1);
 
                                     for (int k = 0; (k < 30) && (c == 32); k++) {
-                                        scanf_s("%c", &c, 1);
+                                        fscanf_s(input, "%c", &c, 1);
                                         if (k == 29) { st = 1; }
                                     }
 
                                     if (c == 124 && n != 0) {
                                         //cout << "zap2";
-                                        p = scanf_s("%lf", &sum1);
-                                        scanf_s("%c", &c, 1);
+                                        p = fscanf_s(input,"%lf", &sum1);
+                                        fscanf_s(input, "%c", &c, 1);
 
                                         //cout << " "; for (int k = 0; k < size(name); k++) { cout << name[k]; } cout << " ";
                                         if (p == 0) { cl3 = cl3.select_(sum); }
@@ -1905,7 +1943,7 @@ public:
                                         cl3.additself(cl2);//cout << 4;
 
                                         for (int k = 0; (k < 30) && (c == 32); k++) {
-                                            scanf_s("%c", &c, 1);
+                                            fscanf_s(input, "%c", &c, 1);
                                             if (k == 29) { st = 1; }
                                         }
 
@@ -1918,18 +1956,18 @@ public:
                                         //...................................................................................................
                                         cl3 = cl2;
 
-                                        n = scanf_s("%lf", &sum);
-                                        scanf_s("%c", &c, 1);
+                                        n = fscanf_s(input,"%lf", &sum);
+                                        fscanf_s(input, "%c", &c, 1);
 
                                         for (int k = 0; (k < 30) && (c == 32); k++) {
-                                            scanf_s("%c", &c, 1);
+                                            fscanf_s(input, "%c", &c, 1);
                                             if (k == 29) { st = 1; }
                                         }
 
                                         if (c == 124 && n == 1) {
                                             //cout << "zap2";
-                                            p = scanf_s("%lf", &sum1);
-                                            scanf_s("%c", &c, 1);
+                                            p = fscanf_s(input,"%lf", &sum1);
+                                            fscanf_s(input, "%c", &c, 1);
 
                                             //cout << " "; for (int k = 0; k < size(name); k++) { cout << name[k]; } cout << " ";
                                             if (p == 0) { cl3 = cl3.select_(sum); }
@@ -1938,7 +1976,7 @@ public:
                                             cl2 = cl3; //cout << 4;
 
                                             for (int k = 0; (k < 30) && (c == 32); k++) {
-                                                scanf_s("%c", &c, 1);
+                                                fscanf_s(input, "%c", &c, 1);
                                                 if (k == 29) { st = 1; }
                                             }
 
@@ -1957,21 +1995,21 @@ public:
                             if (c == 41 && n == 0) { fiskob = 1; }
                         }
                     }
-                    scanf_s("%c", &c, 1);
+                    fscanf_s(input, "%c", &c, 1);
                     //int p11 = c;  cout << p11;
                     if (c == 61) {
                         if (fskob == 1 && sskob == 1 && thskob == 1 && foskob == 1 && fiskob == 1) {
                             cl = cl2;
-                            cout << "\n\n";
-                            cl.print_base();
-                            cout << "\n";
+                            fprintf(output, "\n\n");
+                            cl.print_base_file(output);
+                            fprintf(output, "\n");
                         }
                     }
                     else {
                         if (fskob == 1 && sskob == 1 && thskob == 1 && foskob == 1 && fiskob == 1) {
-                            cout << "\n\n";
-                            cl2.print_base();
-                            cout << "\n";
+                            fprintf(output, "\n\n");
+                            cl2.print_base_file(output);
+                            fprintf(output, "\n");
                         }
                     }
                 }
@@ -1979,29 +2017,35 @@ public:
                 if (cas == 5) {
                     n = 0; s = 0;
                     if (c == 40) {
-                        s = scanf_s("%d", &n);
-                        scanf_s("%c", &c,1);
+                        s = fscanf_s(input,"%d", &n);
+                        fscanf_s(input,"%c", &c,1);
                         for (int k = 0; (k < 30) && (c == 32); k++) {
-                            scanf_s("%c", &c,1);
+                            fscanf_s(input,"%c", &c,1);
                             if (k == 29) { st = 1; }
                         }
                         if (c == 41 && s == 1) {
                             cl.generate_base(n);
-                            cout << "\n\n";
-                            cl.print_base();
-                            cout << "\n";
+                           
                         }
+                    }
+                    fscanf_s(input, "%c", &c, 1);
+                    //int p11 = c;  cout << p11;
+                    if (c != 45) {
+                        fprintf(output, "\n\n");
+                        cl.print_base_file(output);
+                        //cl.print_base();
+                        fprintf(output, "\n");
                     }
                 }
 
                 if (cas == 6) {
                     if (c == 40) {
-                        scanf_s("%c", &c,1);
+                        fscanf_s(input,"%c", &c,1);
                         if (c == 41) {
                             cl.correct();
-                            cout << "\n\n";
-                            cl.print_base();
-                            cout << "\n";
+                            fprintf(output, "\n\n");
+                            cl.print_base_file(output);
+                            fprintf(output, "\n");
                         }
                     }
                 }
@@ -2012,25 +2056,25 @@ public:
                     n = 0; s = 0; p = 0; fskob = 0;
                     if (c == 40) {
                         //cout << "(skob1)";
-                        scanf_s("%c", &c, 1); pl = c;
+                        fscanf_s(input, "%c", &c, 1); pl = c;
                         for (int k = 0; (k < 255) && (((c > -33) && (c < -15)) || ((c > -129) && (c < -80))); k++) {
-                            fixchar(c);  surname.append(1, c); scanf_s("%c", &c, 1); s = 1;
+                            fixchar(c);  surname.append(1, c); fscanf_s(input, "%c", &c, 1); s = 1;
                         }
                         if (c == 44) {
                             //cout << "(zap1)";
-                            scanf_s("%c", &c, 1);
+                            fscanf_s(input, "%c", &c, 1);
                             for (int k = 0; (k < 255) && (((c > -33) && (c < -15)) || ((c > -129) && (c < -80))); k++) {
-                                fixchar(c);  name.append(1, c); scanf_s("%c", &c, 1); n = 1;
+                                fixchar(c);  name.append(1, c); fscanf_s(input, "%c", &c, 1); n = 1;
                             }
                             if (c == 44) {
                                 //cout << "(zap2)";
-                                scanf_s("%c", &c, 1);
+                                fscanf_s(input, "%c", &c, 1);
                                 for (int k = 0; (k < 255) && (((c > -33) && (c < -15)) || ((c > -129) && (c < -80))); k++) {
-                                    fixchar(c);  patron.append(1, c); scanf_s("%c", &c, 1); p = 1;
+                                    fixchar(c);  patron.append(1, c); fscanf_s(input, "%c", &c, 1); p = 1;
                                 }
 
                                 for (int k = 0; (k < 30) && (c == 32); k++) {
-                                    scanf_s("%c", &c, 1);
+                                    fscanf_s(input, "%c", &c, 1);
                                     if (k == 29) { st = 1; }
                                 }
 
@@ -2054,18 +2098,18 @@ public:
 
                     }
                     n = 0; s = 0; p = 0; sskob = 0;
-                    scanf_s("%c", &c, 1);
+                    fscanf_s(input, "%c", &c, 1);
                     if (c == 40) {
                         //cout << "(skob1)";
-                        n = scanf_s("%lld", &num);
-                        scanf_s("%c", &c, 1);
+                        n = fscanf_s(input,"%lld", &num);
+                        fscanf_s(input, "%c", &c, 1);
 
                         if (n != 0) { cli.number = num; }
                         n = 0;
                         num = -1;
 
                         for (int k = 0; (k < 30) && (c == 32); k++) {
-                            scanf_s("%c", &c, 1);
+                            fscanf_s(input, "%c", &c, 1);
                             if (k == 29) { st = 1; }
                         }
 
@@ -2076,33 +2120,33 @@ public:
                     }
                     n = 0; s = 0; p = 0; n1 = 0; s1 = 0; p1 = 0; thskob = 0;
                     brek = 0;
-                    scanf_s("%c", &c, 1);
+                    fscanf_s(input, "%c", &c, 1);
                     if (c == 40) {
-                        n = scanf_s("%d", &day);
-                        scanf_s("%c", &c, 1);
+                        n = fscanf_s(input,"%d", &day);
+                        fscanf_s(input, "%c", &c, 1);
 
                         for (int k = 0; (k < 30) && (c == 32); k++) {
-                            scanf_s("%c", &c, 1);
+                            fscanf_s(input, "%c", &c, 1);
                             if (k == 29) { st = 1; }
                         }
 
                         if (c == 46) {
 
-                            p = scanf_s("%d", &month);
-                            scanf_s("%c", &c, 1);
+                            p = fscanf_s(input,"%d", &month);
+                            fscanf_s(input, "%c", &c, 1);
 
                             for (int k = 0; (k < 30) && (c == 32); k++) {
-                                scanf_s("%c", &c, 1);
+                                fscanf_s(input, "%c", &c, 1);
                                 if (k == 29) { st = 1; }
                             }
 
                             if (c == 46) {
 
-                                s = scanf_s("%d", &year);
-                                scanf_s("%c", &c, 1);
+                                s = fscanf_s(input,"%d", &year);
+                                fscanf_s(input, "%c", &c, 1);
 
                                 for (int k = 0; (k < 30) && (c == 32); k++) {
-                                    scanf_s("%c", &c, 1);
+                                    fscanf_s(input, "%c", &c, 1);
                                     if (k == 29) { st = 1; }
                                 }
 
@@ -2128,23 +2172,23 @@ public:
                     }
                     n = 0; s = 0; p = 0; n1 = 0; s1 = 0; p1 = 0; foskob = 0;
                     brek = 0; pr = 0;
-                    scanf_s("%c", &c, 1);
+                    fscanf_s(input, "%c", &c, 1);
                     if (c == 40) {
 
-                        n = scanf_s("%lf", &pr);
+                        n = fscanf_s(input,"%lf", &pr);
                         if (n != 0) { prod.push_back(pr); }
 
                         while (brek != -1) {
-                            scanf_s("%c", &c, 1);
+                            fscanf_s(input, "%c", &c, 1);
 
                             for (int k = 0; (k < 30) && (c == 32); k++) {
-                                scanf_s("%c", &c, 1);
+                                fscanf_s(input, "%c", &c, 1);
                                 if (k == 29) { st = 1; }
                             }
 
                             if (c == 124) {
 
-                                n = scanf_s("%lf", &pr);
+                                n = fscanf_s(input,"%lf", &pr);
                                 if (n != 0) {
                                     prod.push_back(pr);
                                 }
@@ -2166,23 +2210,29 @@ public:
                         if (s == 6) {
                             cl2.add_cl(cli.surname, cli.name, cli.patronymic, cli.arr, cli.number, cli.prod);
                             cl.add_cl(cli.surname, cli.name, cli.patronymic, cli.arr, cli.number, cli.prod);
-                            cout << "\n\n";
-                            cl2.print_base();
-                            cout << "\n";
+                            fprintf(output,"\n\n");
+                            cl2.print_base_file(output);
+                            fprintf(output,"\n\n");
                         }
                     }
 
                 }
 
                 if (cas == 8) {
-                    st1 = 1; cout << "\nend of imput\n";
+                    st1 = 1; fprintf(output,"\nend of imput\n");
                 }
 
                 if (cas == -1) {
-                    cout << "\n\nnot a command!\n\n";
+                    fprintf(output,"not a command!\n");
+                    //for (i = 0; i < size(imp); i++) { cout << imp[i]; }
+                }
+                if (cas == 9) {
+                    st1 = 1; b = 1;
                 }
 
-                cout << "(next cicle)\n";
+                if (b > 0.5) {
+                    fprintf(output, "(next cicle)\n");
+                }b = 0;
 
 
                 //cout << st;
@@ -2199,7 +2249,7 @@ public:
 
     void generate_base(int n) {
         setlocale(LC_ALL, "Russian");
-        srand(time(0));
+        //srand(time(0));
         long long int value = 0;
 
         vector<string> name_male;

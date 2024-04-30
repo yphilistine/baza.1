@@ -129,6 +129,7 @@
   <ItemGroup>
     <ClCompile Include="base.cpp" />
     <ClCompile Include="baza.1.cpp" />
+    <ClCompile Include="Client.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="base.h" />
