@@ -2249,6 +2249,7 @@ public:
 
     void generate_base(int n) {
         setlocale(LC_ALL, "Russian");
+        //cout << rand();
         //srand(time(0));
         long long int value = 0;
 
