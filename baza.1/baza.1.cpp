@@ -53,6 +53,7 @@ void ClientHandler(int index) {
 			}
 			out1.close();
 			
+			cout << "command complete, client num:" << i+1 << "\n";
 			int msg_size = msg2.size();
 			send(Connections[i], (char*)&msg_size, sizeof(int), NULL);
 			send(Connections[i], msg2.c_str(), msg_size, NULL);
