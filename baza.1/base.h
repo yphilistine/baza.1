@@ -9,6 +9,7 @@
 #include <algorithm>
 #include <cstdio>
 #include <stdio.h>
+#include <random>
 using namespace std; 
 
 
@@ -2249,8 +2250,8 @@ public:
 
     void generate_base(int n) {
         setlocale(LC_ALL, "Russian");
-        //cout << rand();
-        //srand(time(0));
+        random_device rd;   // non-deterministic generator
+        mt19937 gen(rd());  // to seed mersenne twister.
         long long int value = 0;
 
         vector<string> name_male;
@@ -2271,18 +2272,18 @@ public:
         //mfiletovector("costs.txt",prod1);
 
         for (int i = 0; i < n; i++) {
-            int month = rand() % 12 +1;
-            int day = rand();
-            int year = rand() % 24 + 2000;
+            int month = gen() % 12 +1;
+            int day = gen();
+            int year = gen() % 24 + 2000;
             int arr[3]; //cout << "(" << month << ") ";
 
-            int numprod = rand() % 20 + 1;
+            int numprod = gen() % 20 + 1;
             double cost,cost1 ;
 
             vector<double> prod = { };
             for (int c = 0; c < numprod; c++) {
-                cost = rand() % 48000; cost = cost * 10;
-                cost1 = rand() % 1000; cost1 = cost1 / 100;
+                cost = gen() % 48000; cost = cost * 10;
+                cost1 = gen() % 1000; cost1 = cost1 / 100;
                 cost = cost + cost1 +20000;
                 prod.push_back(cost);
             }
@@ -2300,9 +2301,9 @@ public:
                 arr[0] = day % 28 + 1; arr[1] = month; arr[2] = year;
             };
 
-            const long long int c = rand() % 10 + (rand() % 10) * 10 + (rand() % 10) * 100 + (rand() % 10) * 100 + (rand() % 10) * 1000 + (rand() % 10) * 10000 + (rand() % 10) * 100000 + (rand() % 10) * 1000000;
-            const int m = rand() % 9; //cout << " (" << m << ") \n"; 
-            const int m1 = rand() % 2 + 7;
+            const long long int c = gen() % 10 + (gen() % 10) * 10 + (gen() % 10) * 100 + (gen() % 10) * 100 + (gen() % 10) * 1000 + (gen() % 10) * 10000 + (gen() % 10) * 100000 + (gen() % 10) * 1000000;
+            const int m = gen() % 9; //cout << " (" << m << ") \n"; 
+            const int m1 = gen() % 2 + 7;
             value = 0;
             if (m == 0) { value = 4950000000 + c + m1 * 10000000000;}
             if (m == 1) { value = 4990000000 + c + m1 * 10000000000;}
@@ -2315,14 +2316,14 @@ public:
             if (m == 8) { value = 9680000000 + c + m1 * 10000000000;}
             //cout << " (" << value << ") \n";
 
-            if (rand() % 2 == 0) {
+            if (gen() % 2 == 0) {
 
-                add_cl(surname_male[rand() % surname_male.size()], name_male[rand() % name_male.size()],
-                    sec_name_male[rand() % sec_name_male.size()], arr, value,prod);
+                add_cl(surname_male[gen() % surname_male.size()], name_male[gen() % name_male.size()],
+                    sec_name_male[gen() % sec_name_male.size()], arr, value,prod);
             }
             else {
-                add_cl(surname_fem[rand() % surname_fem.size()], name_fem[rand() % name_fem.size()],
-                    sec_name_fem[rand() % sec_name_fem.size()], arr, value,prod);
+                add_cl(surname_fem[gen() % surname_fem.size()], name_fem[gen() % name_fem.size()],
+                    sec_name_fem[gen() % sec_name_fem.size()], arr, value,prod);
             }
         };
         //......................................................................................................................................

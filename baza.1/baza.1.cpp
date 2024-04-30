@@ -8,6 +8,7 @@
 #include <algorithm>
 #include <cstdio>
 #include <stdio.h>
+#include <random>
 
 #pragma comment(lib, "ws2_32.lib")
 #include <winsock2.h>
@@ -50,7 +51,7 @@ void ClientHandler(int index) {
 			{
 				msg2.append(msg1); msg2.append("\n");
 			}
-			out1.close();     // закрываем файл
+			out1.close();
 			
 			int msg_size = msg2.size();
 			send(Connections[i], (char*)&msg_size, sizeof(int), NULL);
@@ -62,7 +63,6 @@ void ClientHandler(int index) {
 }
 
 int main(int argc, char* argv[]) {
-	srand(time(0));
 
 	
 	//WSAStartup
