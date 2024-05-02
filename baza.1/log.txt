@@ -11,3 +11,15 @@ print()
 generate(200)
 select(Морозов,,)()()()()
 select(Морозов,, / Борисов,,)()()()()
+
+//
+
+
+//
+
+
+//
+
+generate(10)
+generate(15)
+generate(20)

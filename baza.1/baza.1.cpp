@@ -15,7 +15,8 @@
 
 #pragma warning(disable: 4996)
 
-SOCKET Connections[100];
+vector<int> ind;
+vector<SOCKET> Connections;
 int Counter = 0;
 client_data cl;
 
@@ -38,6 +39,7 @@ void ClientHandler(int index) {
 		if (connect1 == SOCKET_ERROR) {
 			cout << "Can't receive message from Client. Error # " << WSAGetLastError() << " index #" << index << endl;
 			closesocket(Connections[index]);
+			for (auto i = ind.begin(); i != ind.end(); i++) { if (*i == index) { ind.erase(i); break; } }
 			st = 1;
 		}
 		else {
@@ -49,6 +51,7 @@ void ClientHandler(int index) {
 			if (connect == SOCKET_ERROR) {
 				cout << "Can't receive message from Client. Error # " << WSAGetLastError() << " index #" << index << endl;
 				closesocket(Connections[index]);
+				for (auto i = ind.begin(); i != ind.end(); i++) { if (*i == index) { ind.erase(i); break; } }
 				st = 1;
 			}
 			else {
@@ -76,18 +79,18 @@ void ClientHandler(int index) {
 				out1.close();
 				int msg_size = msg2.size();
 
-				for (int i = 0; i < Counter; i++) {
-					if (i != index) {
+				for (auto i = ind.begin(); i!=ind.end(); i++) {
+					if (*i != index) {
 						string msgi = "client command complete";
 						int msg_size1 = msgi.size();
-						send(Connections[i], (char*)&msg_size1, sizeof(int), NULL);
-						send(Connections[i], msgi.c_str(), msg_size1, NULL);
+						send(Connections[*i], (char*)&msg_size1, sizeof(int), NULL);
+						send(Connections[*i], msgi.c_str(), msg_size1, NULL);
 						continue;
 					}
 
-					cout << "command complete, client num:" << i + 1 << "\n";
-					send(Connections[i], (char*)&msg_size, sizeof(int), NULL);
-					send(Connections[i], msg2.c_str(), msg_size, NULL);
+					cout << "command complete, client num:" << *i + 1 << "\n";
+					send(Connections[*i], (char*)&msg_size, sizeof(int), NULL);
+					send(Connections[*i], msg2.c_str(), msg_size, NULL);
 
 				}
 				delete[] msg;
@@ -122,7 +125,7 @@ int main(int argc, char* argv[]) {
 	listen(sListen, SOMAXCONN);
 
 	SOCKET newConnection;
-	for (int i = 0; i < 100; i++) {
+	for (int i = 0; i < 10000; i++) {
 		newConnection = accept(sListen, (SOCKADDR*)&addr, &sizeofaddr);
 
 		if (newConnection == INVALID_SOCKET) {
@@ -137,8 +140,8 @@ int main(int argc, char* argv[]) {
 			send(newConnection, (char*)&msg_size, sizeof(int), NULL);
 			send(newConnection, msg.c_str(), msg_size, NULL);
 
-			Connections[i] = newConnection;
-			Counter++;
+			Connections.push_back(newConnection);
+			ind.push_back(i);
 			CreateThread(NULL, NULL, (LPTHREAD_START_ROUTINE)ClientHandler, (LPVOID)(i), NULL, NULL);
 		}
 	}
