@@ -21,45 +21,62 @@ int Counter = 0;
 using namespace std;
 
 void ClientHandler(int index) {
-	int msg_size;
+	int msg_size; int connect,connect1; int st = 0;
 	setlocale(LC_ALL, "Russian");
 	client_data cl;
-	while (true) {
-		recv(Connections[index], (char*)&msg_size, sizeof(int), NULL);
-		char* msg = new char[msg_size + 1];
-		msg[msg_size] = '\0';
-		recv(Connections[index], msg, msg_size, NULL);
-		for (int i = 0; i < Counter; i++) {
-			if (i != index) {
-				continue;
-			}
-			//client_data cl, cl1;
-			FILE* out = fopen("out2.txt", "w");
-			FILE* in1 = fopen("in.txt", "w");
-			//cout << msg_size;
-			for (int i = 0; i < msg_size; i++) {
-				fprintf(in1, "%c", msg[i]);
-			}
-			fclose(in1);
-			FILE* in = fopen("in.txt", "r");
-			cl.imput(cl, out, in);
-			fclose(in);
-			fclose(out);
-			ifstream out1("out2.txt");
-			string msg1 = ""; string msg2 = "";
-			while (getline(out1, msg1))
-			{
-				msg2.append(msg1); msg2.append("\n");
-			}
-			out1.close();
-			
-			cout << "command complete, client num:" << i+1 << "\n";
-			int msg_size = msg2.size();
-			send(Connections[i], (char*)&msg_size, sizeof(int), NULL);
-			send(Connections[i], msg2.c_str(), msg_size, NULL);
-			
+	while (st==0) {
+		connect1=recv(Connections[index], (char*)&msg_size, sizeof(int), NULL);
+		if (connect1 == SOCKET_ERROR) {
+			cout << "Can't receive message from Client. Error # " << WSAGetLastError() <<" index #"<< index << endl;
+			closesocket(Connections[index]);
+			st = 1;
 		}
-		delete[] msg;
+		else {
+			char* msg = new char[msg_size + 1];
+			msg[msg_size] = '\0';
+
+			connect = recv(Connections[index], msg, msg_size, NULL);
+
+			if (connect == SOCKET_ERROR) {
+				cout << "Can't receive message from Client. Error # " << WSAGetLastError() << " index #" << index << endl;
+				closesocket(Connections[index]);
+				st = 1;
+			}
+			else {
+				for (int i = 0; i < Counter; i++) {
+					if (i != index) {
+						continue;
+					}
+
+					//client_data cl, cl1;
+					FILE* out = fopen("out2.txt", "w");
+					FILE* in1 = fopen("in.txt", "w");
+					//cout << msg_size;
+					for (int i = 0; i < msg_size; i++) {
+						fprintf(in1, "%c", msg[i]);
+					}
+					fclose(in1);
+					FILE* in = fopen("in.txt", "r");
+					cl.imput(cl, out, in);
+					fclose(in);
+					fclose(out);
+					ifstream out1("out2.txt");
+					string msg1 = ""; string msg2 = "";
+					while (getline(out1, msg1))
+					{
+						msg2.append(msg1); msg2.append("\n");
+					}
+					out1.close();
+
+					cout << "command complete, client num:" << i + 1 << "\n";
+					int msg_size = msg2.size();
+					send(Connections[i], (char*)&msg_size, sizeof(int), NULL);
+					send(Connections[i], msg2.c_str(), msg_size, NULL);
+
+				}
+				delete[] msg;
+			}
+		}
 	}
 }
 
@@ -88,12 +105,14 @@ int main(int argc, char* argv[]) {
 	for (int i = 0; i < 100; i++) {
 		newConnection = accept(sListen, (SOCKADDR*)&addr, &sizeofaddr);
 
-		if (newConnection == 0) {
-			std::cout << "Error #2\n";
+		if (newConnection == INVALID_SOCKET) {
+			//cout << "Client detected, but can't connect to a client. Error # " << WSAGetLastError() << endl;
+			closesocket(sListen);
+			closesocket(newConnection);
 		}
 		else {
 			std::cout << "Client Connected!\n";
-			std::string msg = "Initiate imput.\n";
+			std::string msg = "\n";
 			int msg_size = msg.size();
 			send(newConnection, (char*)&msg_size, sizeof(int), NULL);
 			send(newConnection, msg.c_str(), msg_size, NULL);
@@ -104,7 +123,7 @@ int main(int argc, char* argv[]) {
 		}
 	}
 
-
+	WSACleanup();
 	system("pause");
 	return 0;
 }
