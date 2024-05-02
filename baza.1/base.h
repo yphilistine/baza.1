@@ -2272,6 +2272,7 @@ public:
         //mfiletovector("costs.txt",prod1);
 
         for (int i = 0; i < n; i++) {
+            //cout << i << " ";
             int month = gen() % 12 +1;
             int day = gen();
             int year = gen() % 24 + 2000;

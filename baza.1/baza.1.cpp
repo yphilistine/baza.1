@@ -21,13 +21,22 @@ client_data cl;
 
 using namespace std;
 
+char fixchar(char c) {
+	char c1=c;
+	if (c == -16) { c1 = -88; return c1; }
+	if (c == -15) { c1 = -72; return c1; }
+	if (c >= -128 && c <= -81) { c1 = c + 64; return c1; }
+	if (c >= -32 && c <= -17) { c1 = c + 16; return c1; }
+}
+
+
 void ClientHandler(int index) {
-	int msg_size; int connect,connect1; int st = 0;
+	int msg_size; int connect, connect1; int st = 0;
 	setlocale(LC_ALL, "Russian");
-	while (st==0) {
-		connect1=recv(Connections[index], (char*)&msg_size, sizeof(int), NULL);
+	while (st == 0) {
+		connect1 = recv(Connections[index], (char*)&msg_size, sizeof(int), NULL);
 		if (connect1 == SOCKET_ERROR) {
-			cout << "Can't receive message from Client. Error # " << WSAGetLastError() <<" index #"<< index << endl;
+			cout << "Can't receive message from Client. Error # " << WSAGetLastError() << " index #" << index << endl;
 			closesocket(Connections[index]);
 			st = 1;
 		}
@@ -45,10 +54,14 @@ void ClientHandler(int index) {
 			else {
 				FILE* out = fopen("out2.txt", "w");
 				FILE* in1 = fopen("in.txt", "w");
+				FILE* log = fopen("log.txt", "a");
 				//cout << msg_size;
 				for (int i = 0; i < msg_size; i++) {
 					fprintf(in1, "%c", msg[i]);
+					fprintf(log, "%c", fixchar(msg[i]));
 				}
+				fprintf(log, "\n");
+				fclose(log);
 				fclose(in1);
 				FILE* in = fopen("in.txt", "r");
 				cl.imput(cl, out, in);
@@ -66,7 +79,7 @@ void ClientHandler(int index) {
 				for (int i = 0; i < Counter; i++) {
 					if (i != index) {
 						string msgi = "client command complete";
-						int msg_size1 = msgi.size(); 
+						int msg_size1 = msgi.size();
 						send(Connections[i], (char*)&msg_size1, sizeof(int), NULL);
 						send(Connections[i], msgi.c_str(), msg_size1, NULL);
 						continue;
@@ -84,6 +97,10 @@ void ClientHandler(int index) {
 }
 
 int main(int argc, char* argv[]) {
+	setlocale(LC_ALL, "Russian");
+	FILE* log = fopen("log.txt", "a");
+	fprintf(log, "\n//\n\n");
+	fclose(log);
 
 	client_data cl;
 	//WSAStartup
@@ -133,56 +150,57 @@ int main(int argc, char* argv[]) {
 /*
 int main()
 {
-    setlocale(LC_ALL, "Russian");
-    int n,i;
-    client_data clients;
-    printf("Размер базы данных: ");
-    cin >> n;
-    cout << "\n";
+	setlocale(LC_ALL, "Russian");
+	int n,i;
+	client_data clients;
+	printf("Размер базы данных: ");
+	cin >> n;
+	cout << "\n";
 
-    clients.generate_base(n);
-    clients.print_base();
-    //clients.print_base_file("out");
-    cout << "next base.........................................................................\n"; cout << "\n\n";
+	clients.generate_base(n);
+	clients.print_base();
+	//clients.print_base_file("out");
+	cout << "next base.........................................................................\n"; cout << "\n\n";
 
-    //clients.getlen();
-    clients.delete_cl(3);
-    clients.print_base();
-    //clients.print_base_file("out");
-    cout << "0()next base.........................................................................\n"; cout << "\n\n";
+	//clients.getlen();
+	clients.delete_cl(3);
+	clients.print_base();
+	//clients.print_base_file("out");
+	cout << "0()next base.........................................................................\n"; cout << "\n\n";
 
-    int arr1[3] = { 29,9,2004 };
-    int arr11[3] = { 1,1,2000 };
-    vector<double> prod1 = { 95699.55, 120499.99 };
-    double avg1 = (95699.55 + 120499.99) / 2;
-    double sum1 = 95699.55 + 120499.99;
-    vector<double> prod11 = { 95699.55, 120499.99,501000.9 };
+	int arr1[3] = { 29,9,2004 };
+	int arr11[3] = { 1,1,2000 };
+	vector<double> prod1 = { 95699.55, 120499.99 };
+	double avg1 = (95699.55 + 120499.99) / 2;
+	double sum1 = 95699.55 + 120499.99;
+	vector<double> prod11 = { 95699.55, 120499.99,501000.9 };
 
-    //clients.getlen();
-    clients.edit_cl(5,"Морозов","Андрей","Александрович",arr1,79175294117,prod1);
-    clients.edit_cl(6, "Жепчанов", "Константин", "Холович", arr1, 79175554678, prod1);
-    clients.edit_cl("Жепчанов", "Константин", "Холович","Штольц","Александр","Владимирович", arr1, 79175554678, prod11);
-    clients.delete_cl("Жепчанов", "Константин", "Холович"); 
-    clients.print_base();
+	//clients.getlen();
+	clients.edit_cl(5,"Морозов","Андрей","Александрович",arr1,79175294117,prod1);
+	clients.edit_cl(6, "Жепчанов", "Константин", "Холович", arr1, 79175554678, prod1);
+	clients.edit_cl("Жепчанов", "Константин", "Холович","Штольц","Александр","Владимирович", arr1, 79175554678, prod11);
+	clients.delete_cl("Жепчанов", "Константин", "Холович");
+	clients.print_base();
 
-    cout << "1()next base.........................................................................\n"; cout << "\n\n";
+	cout << "1()next base.........................................................................\n"; cout << "\n\n";
 
-    (clients.correct()).print_base_file("out2.txt");
-    clients.sortby_date();
-    clients.print_base();
-    clients.print_base_file("out");
+	(clients.correct()).print_base_file("out2.txt");
+	clients.sortby_date();
+	clients.print_base();
+	clients.print_base_file("out");
 
-    cout << "2()next base.........................................................................\n"; cout << "\n\n";
+	cout << "2()next base.........................................................................\n"; cout << "\n\n";
 
-    client_data oldclients;
-    oldclients = clients.select_(arr1,avg1,sum1,79175294117);
-    //oldclients.print_base_file("out2.txt");
-    oldclients.print_base();
+	client_data oldclients;
+	oldclients = clients.select_(arr1,avg1,sum1,79175294117);
+	//oldclients.print_base_file("out2.txt");
+	oldclients.print_base();
 
-    cout << "3()imput section.........................................................................\n"; //cout << "\n\n";
-    cout << "..................................................................................\n"; cout << "\n\n";
-    client_data cl;
-    cl.imput(clients);
-    return 0;
+	cout << "3()imput section.........................................................................\n"; //cout << "\n\n";
+	cout << "..................................................................................\n"; cout << "\n\n";
+	client_data cl;
+	cl.imput(clients);
+	return 0;
 }*/
+//out select(1.1.2000, 24.12.2022 / )()()()(200000,1000000)()
 //out select(1.1.2000, 24.12.2022 / )()()()(200000,1000000)()
