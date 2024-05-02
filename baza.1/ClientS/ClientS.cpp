@@ -1,7 +1,8 @@
-﻿#pragma comment(lib, "ws2_32.lib")
+#pragma comment(lib, "ws2_32.lib")
 #include <winsock2.h>
 #include <iostream>
 #include <string>
+#include <stdlib.h>
 #pragma warning(disable: 4996)
 
 SOCKET Connection;
@@ -9,18 +10,27 @@ using namespace std;
 
 void ClientHandler() {
 	setlocale(LC_ALL, "Russian");
-	int msg_size;
+	int msg_size; int connect;
 	while (true) {
 		recv(Connection, (char*)&msg_size, sizeof(int), NULL);
 		char* msg = new char[msg_size + 1];
 		msg[msg_size] = '\0';
-		recv(Connection, msg, msg_size, NULL);
+		connect=recv(Connection, msg, msg_size, NULL);
+
+		if (connect == SOCKET_ERROR) {
+			cout << "Can't receive message from Server. Error # " << WSAGetLastError() << endl;
+			closesocket(Connection);
+			WSACleanup();
+			break;
+		}
+
 		cout << msg << endl;
 		delete[] msg;
 	}
 }
 
 int main(int argc, char* argv[]) {
+
 	//WSAStartup
 	WSAData wsaData;
 	WORD DLLVersion = MAKEWORD(2, 1);
@@ -37,10 +47,10 @@ int main(int argc, char* argv[]) {
 
 	Connection = socket(AF_INET, SOCK_STREAM, NULL);
 	if (connect(Connection, (SOCKADDR*)&addr, sizeof(addr)) != 0) {
-		cout << "Initiate input.\n";
+		cout << "\n";
 		return 1;
 	}
-	cout << "Connected!\n";
+	cout << "Connected!\nInitiate Imput\n";
 
 	CreateThread(NULL, NULL, (LPTHREAD_START_ROUTINE)ClientHandler, NULL, NULL, NULL);
 
@@ -52,6 +62,7 @@ int main(int argc, char* argv[]) {
 		send(Connection, msg1.c_str(), msg_size, NULL);
 		Sleep(10);
 	}
+
 
 	system("pause");
 	return 0;
