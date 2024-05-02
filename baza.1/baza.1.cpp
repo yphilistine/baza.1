@@ -17,13 +17,13 @@
 
 SOCKET Connections[100];
 int Counter = 0;
+client_data cl;
 
 using namespace std;
 
 void ClientHandler(int index) {
 	int msg_size; int connect,connect1; int st = 0;
 	setlocale(LC_ALL, "Russian");
-	client_data cl;
 	while (st==0) {
 		connect1=recv(Connections[index], (char*)&msg_size, sizeof(int), NULL);
 		if (connect1 == SOCKET_ERROR) {
@@ -43,33 +43,36 @@ void ClientHandler(int index) {
 				st = 1;
 			}
 			else {
+				FILE* out = fopen("out2.txt", "w");
+				FILE* in1 = fopen("in.txt", "w");
+				//cout << msg_size;
+				for (int i = 0; i < msg_size; i++) {
+					fprintf(in1, "%c", msg[i]);
+				}
+				fclose(in1);
+				FILE* in = fopen("in.txt", "r");
+				cl.imput(cl, out, in);
+				fclose(in);
+				fclose(out);
+				ifstream out1("out2.txt");
+				string msg1 = ""; string msg2 = "";
+				while (getline(out1, msg1))
+				{
+					msg2.append(msg1); msg2.append("\n");
+				}
+				out1.close();
+				int msg_size = msg2.size();
+
 				for (int i = 0; i < Counter; i++) {
 					if (i != index) {
+						string msgi = "client command complete";
+						int msg_size1 = msgi.size(); 
+						send(Connections[i], (char*)&msg_size1, sizeof(int), NULL);
+						send(Connections[i], msgi.c_str(), msg_size1, NULL);
 						continue;
 					}
 
-					//client_data cl, cl1;
-					FILE* out = fopen("out2.txt", "w");
-					FILE* in1 = fopen("in.txt", "w");
-					//cout << msg_size;
-					for (int i = 0; i < msg_size; i++) {
-						fprintf(in1, "%c", msg[i]);
-					}
-					fclose(in1);
-					FILE* in = fopen("in.txt", "r");
-					cl.imput(cl, out, in);
-					fclose(in);
-					fclose(out);
-					ifstream out1("out2.txt");
-					string msg1 = ""; string msg2 = "";
-					while (getline(out1, msg1))
-					{
-						msg2.append(msg1); msg2.append("\n");
-					}
-					out1.close();
-
 					cout << "command complete, client num:" << i + 1 << "\n";
-					int msg_size = msg2.size();
 					send(Connections[i], (char*)&msg_size, sizeof(int), NULL);
 					send(Connections[i], msg2.c_str(), msg_size, NULL);
 
@@ -82,7 +85,7 @@ void ClientHandler(int index) {
 
 int main(int argc, char* argv[]) {
 
-	
+	client_data cl;
 	//WSAStartup
 	WSAData wsaData;
 	WORD DLLVersion = MAKEWORD(2, 1);
