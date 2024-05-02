@@ -10,9 +10,9 @@ using namespace std;
 
 void ClientHandler() {
 	setlocale(LC_ALL, "Russian");
-	int msg_size; int connect,connect1;
+	int msg_size; int connect, connect1;
 	while (true) {
-		connect1=recv(Connection, (char*)&msg_size, sizeof(int), NULL);
+		connect1 = recv(Connection, (char*)&msg_size, sizeof(int), NULL);
 		if (connect1 == SOCKET_ERROR) {
 			cout << "Can't receive message from Server. Error # " << WSAGetLastError() << endl;
 			closesocket(Connection);
@@ -21,6 +21,9 @@ void ClientHandler() {
 		}
 		else {
 			char* msg = new char[msg_size + 1];
+			for (int i = 0; i < msg_size; i++) {
+				msg[i] = 32;
+			}
 			msg[msg_size] = '\0';
 			connect = recv(Connection, msg, msg_size, NULL);
 
@@ -31,13 +34,15 @@ void ClientHandler() {
 				break;
 			}
 			else {
-				cout << msg << endl;
+				for (int i = 0; i < msg_size; i++) {
+					cout << msg[i];
+				}
+				cout << endl;
 				delete[] msg;
 			}
 		}
 	}
 }
-
 int main(int argc, char* argv[]) {
 
 	//WSAStartup
