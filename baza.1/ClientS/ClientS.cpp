@@ -13,7 +13,7 @@ void ClientHandler() {
 	int msg_size; int connect,connect1;
 	while (true) {
 		connect1=recv(Connection, (char*)&msg_size, sizeof(int), NULL);
-		if (connect == SOCKET_ERROR) {
+		if (connect1 == SOCKET_ERROR) {
 			cout << "Can't receive message from Server. Error # " << WSAGetLastError() << endl;
 			closesocket(Connection);
 			WSACleanup();
