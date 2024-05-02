@@ -10,22 +10,31 @@ using namespace std;
 
 void ClientHandler() {
 	setlocale(LC_ALL, "Russian");
-	int msg_size; int connect;
+	int msg_size; int connect,connect1;
 	while (true) {
-		recv(Connection, (char*)&msg_size, sizeof(int), NULL);
-		char* msg = new char[msg_size + 1];
-		msg[msg_size] = '\0';
-		connect=recv(Connection, msg, msg_size, NULL);
-
+		connect1=recv(Connection, (char*)&msg_size, sizeof(int), NULL);
 		if (connect == SOCKET_ERROR) {
 			cout << "Can't receive message from Server. Error # " << WSAGetLastError() << endl;
 			closesocket(Connection);
 			WSACleanup();
 			break;
 		}
+		else {
+			char* msg = new char[msg_size + 1];
+			msg[msg_size] = '\0';
+			connect = recv(Connection, msg, msg_size, NULL);
 
-		cout << msg << endl;
-		delete[] msg;
+			if (connect == SOCKET_ERROR) {
+				cout << "Can't receive message from Server. Error # " << WSAGetLastError() << endl;
+				closesocket(Connection);
+				WSACleanup();
+				break;
+			}
+			else {
+				cout << msg << endl;
+				delete[] msg;
+			}
+		}
 	}
 }
 
