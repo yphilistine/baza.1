@@ -770,7 +770,7 @@ public:
     }
 
     void imput(client_data &clien, FILE* output, FILE* input) {
-        vector<string> com = { "edit","delete","print","sort","select","generate","correct","add","break",""};
+        vector<string> com = { "edit","delete","print","sort","select","generate","correct","add","break","","clear"};
         vector<string> sortcase = { "date","dt","num","number","avg","average","sum","summ" };
         int br = 0, st = 0, cas = -1, st1 = 0, sortcas = -1;
         char c=0; //10 enter 32 space 40 ( 41 ) 47 / 44 , 38 & 46 . 124 | 61 =
@@ -797,10 +797,10 @@ public:
             string sortc = "";
             client cli(1,surname,name,patron,arr,num,prod);
             
-            fscanf(input, "%c", &c);
+            fscanf_s(input, "%c", &c,1);
             cas = -1; st1 = 0;
             for (i = 0; (i < 255) && ((c == 10) || (c == 32) || (c==-52)); i++) {
-                fscanf(input,"%c", &c);
+                fscanf_s(input,"%c", &c,1);
                 if (i == 254) { st = 1; };
             }
            
@@ -811,7 +811,7 @@ public:
 
                 //for (i = 0; i < size(imp); i++) {cout << imp[i];}
 
-                for (i = 0; i < 10; i++) {
+                for (i = 0; i < 11; i++) {
                     if (imp == com[i]) { cas = i; }
                 }
                 //cout << cas << "\n";
@@ -2220,7 +2220,12 @@ public:
                 }
 
                 if (cas == 8) {
-                    st1 = 1; fprintf(output,"\nend of imput\n");
+                    if (c == 40) {
+                        fscanf_s(input, "%c", &c, 1);
+                        if (c == 41) {
+                            st1 = 1; fprintf(output, "\nend of imput\n");
+                        }
+                    }
                 }
 
                 if (cas == -1) {
@@ -2229,6 +2234,16 @@ public:
                 }
                 if (cas == 9) {
                     st1 = 1; b = 1;
+                }
+                if (cas == 10) {
+                    client_data clnew;
+                    cl = clnew;
+                    if (c == 40) {
+                        fscanf_s(input, "%c", &c, 1);
+                        if (c == 41) {
+                            fprintf(output, "\ncleared\n");
+                        }
+                    }
                 }
 
                 if (b > 0.5) {

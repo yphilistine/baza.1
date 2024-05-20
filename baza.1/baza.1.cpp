@@ -9,6 +9,7 @@
 #include <cstdio>
 #include <stdio.h>
 #include <random>
+#include <mutex>
 
 #pragma comment(lib, "ws2_32.lib")
 #include <winsock2.h>
@@ -19,6 +20,7 @@ vector<int> ind;
 vector<SOCKET> Connections;
 int Counter = 0;
 client_data cl;
+mutex access;
 
 using namespace std;
 
@@ -36,6 +38,7 @@ void ClientHandler(int index) {
 	setlocale(LC_ALL, "Russian");
 	while (st == 0) {
 		connect1 = recv(Connections[index], (char*)&msg_size, sizeof(int), NULL);
+
 		if (connect1 == SOCKET_ERROR) {
 			cout << "Can't receive message from Client. Error # " << WSAGetLastError() << " index #" << index << endl;
 			closesocket(Connections[index]);
@@ -48,10 +51,13 @@ void ClientHandler(int index) {
 
 			connect = recv(Connections[index], msg, msg_size, NULL);
 
+			access.lock();
+
 			if (connect == SOCKET_ERROR) {
 				cout << "Can't receive message from Client. Error # " << WSAGetLastError() << " index #" << index << endl;
 				closesocket(Connections[index]);
 				for (auto i = ind.begin(); i != ind.end(); i++) { if (*i == index) { ind.erase(i); break; } }
+				access.unlock();
 				st = 1;
 			}
 			else {
@@ -81,10 +87,10 @@ void ClientHandler(int index) {
 
 				for (auto i = ind.begin(); i!=ind.end(); i++) {
 					if (*i != index) {
-						string msgi = "client command complete";
+						/*string msgi = "client command complete";
 						int msg_size1 = msgi.size();
 						send(Connections[*i], (char*)&msg_size1, sizeof(int), NULL);
-						send(Connections[*i], msgi.c_str(), msg_size1, NULL);
+						send(Connections[*i], msgi.c_str(), msg_size1, NULL);*/
 						continue;
 					}
 
@@ -95,6 +101,8 @@ void ClientHandler(int index) {
 				}
 				delete[] msg;
 			}
+
+			access.unlock();
 		}
 	}
 }
@@ -125,7 +133,7 @@ int main(int argc, char* argv[]) {
 	listen(sListen, SOMAXCONN);
 
 	SOCKET newConnection;
-	for (int i = 0; i < 10000; i++) {
+	for (int i = 0; i < 100000; i++) {
 		newConnection = accept(sListen, (SOCKADDR*)&addr, &sizeofaddr);
 
 		if (newConnection == INVALID_SOCKET) {
